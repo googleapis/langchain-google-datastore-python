@@ -11,13 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# mypy: disable-error-code="attr-defined"
 
 import pytest
-
-from langchain_core.documents import Document
-from langchain_google_datastore.utility.document_converter import DocumentConverter
 from google.cloud import datastore
 from google.cloud.datastore.helpers import GeoPoint
+from langchain_core.documents import Document
+
+from langchain_google_datastore.utility.document_converter import DocumentConverter
 
 
 @pytest.mark.parametrize(
@@ -62,7 +63,6 @@ from google.cloud.datastore.helpers import GeoPoint
     ],
 )
 def test_convert_firestore_entity_default_fields(entity_dict, langchain_doc) -> None:
-
     entity = pytest.client.entity(entity_dict["key"])
     entity.update(entity_dict["properties"])
 

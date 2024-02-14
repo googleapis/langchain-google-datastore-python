@@ -11,13 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import pytest
+# mypy: disable-error-code="attr-defined"
 
 import time
 import unittest.mock as mock
+from unittest import TestCase
+
+import pytest
 from langchain_core.documents import Document
+
 from langchain_google_datastore import DatastoreLoader, DatastoreSaver
+
+
+@pytest.fixture
+def test_case() -> TestCase:
+    return TestCase()
 
 
 def test_firestore_write_roundtrip_and_load() -> None:
@@ -43,7 +51,7 @@ def test_firestore_write_roundtrip_and_load() -> None:
     assert len(deleted_docs) == 0
 
 
-def test_firestore_write_load_batch() -> None:
+def test_firestore_write_load_batch(test_case: TestCase) -> None:
     saver = DatastoreSaver("WriteBatch")
     loader = DatastoreLoader("WriteBatch")
     NUM_DOCS = 1000
@@ -65,11 +73,11 @@ def test_firestore_write_load_batch() -> None:
     time.sleep(5)
     docs_after_delete = loader.load()
 
-    pytest.case.assertCountEqual(expected_docs, docs_after_write)
+    test_case.assertCountEqual(expected_docs, docs_after_write)
     assert len(docs_after_delete) == 0
 
 
-def test_firestore_write_with_key() -> None:
+def test_firestore_write_with_key(test_case: TestCase) -> None:
     saver = DatastoreSaver()
     loader = DatastoreLoader("WriteRef")
 
@@ -88,11 +96,11 @@ def test_firestore_write_with_key() -> None:
     time.sleep(1)
     deleted_doc = loader.load()
 
-    pytest.case.assertCountEqual(expected_doc, written_doc)
+    test_case.assertCountEqual(expected_doc, written_doc)
     assert len(deleted_doc) == 0
 
 
-def test_firestore_delete_with_keys() -> None:
+def test_firestore_delete_with_keys(test_case: TestCase) -> None:
     saver = DatastoreSaver()
     loader = DatastoreLoader("WriteKind")
 
@@ -119,7 +127,7 @@ def test_firestore_delete_with_keys() -> None:
     time.sleep(1)
     deleted_doc = loader.load()
 
-    pytest.case.assertCountEqual(expected_doc, written_doc)
+    test_case.assertCountEqual(expected_doc, written_doc)
     assert len(deleted_doc) == 0
 
 
@@ -134,7 +142,11 @@ def test_firestore_delete_with_keys() -> None:
     ],
 )
 def test_firestore_load_with_fields(
-    page_properties, metadata_properties, expected_page_content, expected_metadata
+    page_properties,
+    metadata_properties,
+    expected_page_content,
+    expected_metadata,
+    test_case,
 ):
     saver = DatastoreSaver("WritePageFields")
     loader = DatastoreLoader(
@@ -159,11 +171,11 @@ def test_firestore_load_with_fields(
     time.sleep(1)
     deleted_docs = loader.load()
 
-    pytest.case.assertCountEqual(expected_doc, loaded_doc)
+    test_case.assertCountEqual(expected_doc, loaded_doc)
     assert len(deleted_docs) == 0
 
 
-def test_firestore_load_from_query():
+def test_firestore_load_from_query(test_case: TestCase):
     saver = DatastoreSaver("WriteQuery")
     loader_cleanup = DatastoreLoader("WriteQuery")
 
@@ -196,7 +208,7 @@ def test_firestore_load_from_query():
     time.sleep(1)
     deleted_docs = loader.load()
 
-    pytest.case.assertCountEqual(expected_docs, loaded_docs)
+    test_case.assertCountEqual(expected_docs, loaded_docs)
     assert len(deleted_docs) == 0
 
 

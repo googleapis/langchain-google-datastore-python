@@ -14,23 +14,18 @@
 
 from __future__ import annotations
 
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Iterator,
-    List,
-    Optional,
-)
-
 import itertools
+from typing import TYPE_CHECKING, Any, Iterator, List, Optional
+
 import more_itertools
 from google.cloud import datastore
-from langchain_core.documents import Document
 from langchain_community.document_loaders.base import BaseLoader
+from langchain_core.documents import Document
+
 from .utility.document_converter import DocumentConverter
 
 DEFAULT_FIRESTORE_DATABASE = "(default)"
-USER_AGENT = "LangChain"
+USER_AGENT = "langchain-google-datastore-python"
 WRITE_BATCH_SIZE = 500
 
 if TYPE_CHECKING:
@@ -41,8 +36,8 @@ class DatastoreLoader(BaseLoader):
     def __init__(
         self,
         source: Query | str,
-        page_content_properties: List[str] = None,
-        metadata_properties: Optional[List[str]] = None,
+        page_content_properties: List[str] = [],
+        metadata_properties: List[str] = [],
         client: Optional[Client] = None,
     ) -> None:
         """Document Loader for Google Cloud Firestore in Datastore Mode.
@@ -58,10 +53,10 @@ class DatastoreLoader(BaseLoader):
         """
         if client:
             self.client = client
-            self.client._user_agent = USER_AGENT
+            self.client._client_info.user_agent = USER_AGENT
         else:
             self.client = datastore.Client()
-            self.client._user_agent = USER_AGENT
+            self.client._client_info.user_agent = USER_AGENT
 
         self.source = source
         self.page_content_properties = page_content_properties
@@ -103,10 +98,10 @@ class DatastoreSaver:
         self.kind = kind
         if client:
             self.client = client
-            self.client._user_agent = USER_AGENT
+            self.client._client_info.user_agent = USER_AGENT
         else:
             self.client = datastore.Client()
-            self.client._user_agent = USER_AGENT
+            self.client._client_info.user_agent = USER_AGENT
 
     def upsert_documents(
         self,

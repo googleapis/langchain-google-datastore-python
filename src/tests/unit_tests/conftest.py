@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
-from google.cloud import datastore
 from unittest import TestCase
+
+import pytest
+from google.cloud.datastore import Client
 
 
 def pytest_configure():
-    pytest.client = datastore.Client()
-    pytest.case = TestCase()
+    pytest.client: Client = Client()

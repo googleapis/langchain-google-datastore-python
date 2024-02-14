@@ -16,15 +16,10 @@ from __future__ import annotations
 
 import ast
 import itertools
+from typing import TYPE_CHECKING, Any, Dict, List
+
 import more_itertools
-
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    List,
-)
-
-from google.cloud.datastore import Key, Entity
+from google.cloud.datastore import Entity, Key
 from google.cloud.datastore.helpers import GeoPoint
 from langchain_core.documents import Document
 
@@ -33,12 +28,11 @@ if TYPE_CHECKING:
 
 
 class DocumentConverter:
-
     @staticmethod
     def convertFirestoreEntity(
         entity: Entity,
-        page_content_properties: List[str] = None,
-        metadata_properties: List[str] = None,
+        page_content_properties: List[str] = [],
+        metadata_properties: List[str] = [],
     ) -> Document:
         data_entity = dict(entity.items())
         metadata = {"key": entity.key.flat_path}
@@ -80,7 +74,7 @@ class DocumentConverter:
         if len(page_content) == 1:
             page_content = page_content.popitem()[1]
         elif not page_content:
-            page_content = ""
+            page_content = ""  # type: ignore
 
         if not set_metadata_properties:
             # metadata fields not specified. Write remaining fields into metadata
