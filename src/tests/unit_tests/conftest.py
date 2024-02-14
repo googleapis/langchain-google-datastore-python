@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from langchain_google_datastore.document_loader import DatastoreLoader, DatastoreSaver
-from langchain_google_datastore.utility.document_converter import DocumentConverter
+import pytest
+from google.cloud import datastore
+from unittest import TestCase
 
-__all__ = ["DatastoreLoader", "DatastoreSaver"]
+
+def pytest_configure():
+    pytest.client = datastore.Client()
+    pytest.case = TestCase()
