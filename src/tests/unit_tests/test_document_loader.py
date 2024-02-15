@@ -18,6 +18,7 @@ import unittest.mock as mock
 from unittest import TestCase
 
 import pytest
+from google.cloud.datastore import Client
 from langchain_core.documents import Document
 
 from langchain_google_datastore import DatastoreLoader, DatastoreSaver
@@ -218,3 +219,27 @@ def test_firestore_empty_load():
     loaded_docs = loader.load()
 
     assert len(loaded_docs) == 0
+
+
+def test_firestore_custom_client() -> None:
+    client = Client(namespace="namespace")
+    saver = DatastoreSaver("Custom", client=client)
+    loader = DatastoreLoader("Custom", client=client)
+
+    docs = [Document(page_content="data", metadata={})]
+
+    saver.upsert_documents(docs)
+    # wait 1s for consistency
+    time.sleep(1)
+    written_docs = loader.load()
+    saver.delete_documents(written_docs)
+    # wait 1s for consistency
+    time.sleep(1)
+
+    deleted_docs = loader.load()
+
+    assert len(written_docs) == 1
+    assert written_docs[0].page_content == "data"
+    assert written_docs[0].metadata != {}
+    assert "key" in written_docs[0].metadata
+    assert len(deleted_docs) == 0
