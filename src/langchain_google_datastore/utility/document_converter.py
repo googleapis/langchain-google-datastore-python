@@ -26,6 +26,8 @@ from langchain_core.documents import Document
 if TYPE_CHECKING:
     from google.cloud.datastore import Client, Entity
 
+TYPE = "datastore_type"
+
 
 class DocumentConverter:
     @staticmethod
@@ -35,7 +37,7 @@ class DocumentConverter:
         metadata_properties: List[str] = [],
     ) -> Document:
         data_entity = dict(entity.items())
-        metadata = {"key": entity.key.flat_path}
+        metadata = {"key": {"path": entity.key.flat_path, "type": TYPE}}
 
         set_page_properties = set(page_content_properties or [])
         set_metadata_properties = set(metadata_properties or [])
@@ -94,7 +96,11 @@ class DocumentConverter:
         path = None
         data = {}
 
-        if ("key" in metadata) and isinstance(metadata["key"], tuple):
+        if (
+            ("key" in metadata)
+            and ("type" in metadata["key"])
+            and (metadata["key"]["type"] == TYPE)
+        ):
             path = metadata["key"]
             metadata.pop("key")
 
@@ -117,15 +123,20 @@ class DocumentConverter:
     def _convertFromFirestore(val: Any) -> Any:
         val_converted = val
         if isinstance(val, Key):
-            val_converted = {"key": val.flat_path}
+            val_converted = {"key": val.flat_path, "type": TYPE}
         elif isinstance(val, GeoPoint):
-            val_converted = {"latitude": val.latitude, "longitude": val.longitude}
+            val_converted = {
+                "latitude": val.latitude,
+                "longitude": val.longitude,
+                "type": TYPE,
+            }
         elif isinstance(val, Entity):
             val_converted = {
                 "key": val.key.flat_path,
                 "properties": DocumentConverter._convertFromFirestore(
                     dict(val.items())
                 ),
+                "type": TYPE,
             }
         elif isinstance(val, dict):
             val_converted = {
@@ -141,11 +152,29 @@ class DocumentConverter:
         val_converted = val
         if isinstance(val, dict):
             l = len(val)
-            if (l == 1) and ("key" in val) and isinstance(val["key"], tuple):
+            if (
+                (l == 2)
+                and ("key" in val)
+                and isinstance(val["key"], tuple)
+                and ("type" in val)
+                and (val["type"] == TYPE)
+            ):
                 val_converted = client.key(*val["key"])
-            elif (l == 2) and ("latitude" in val) and ("longitude" in val):
+            elif (
+                (l == 3)
+                and ("latitude" in val)
+                and ("longitude" in val)
+                and ("type" in val)
+                and (val["type"] == TYPE)
+            ):
                 val_converted = GeoPoint(val["latitude"], val["longitude"])
-            elif (l == 2) and ("key" in val) and ("properties" in val):
+            elif (
+                (l == 3)
+                and ("key" in val)
+                and ("properties" in val)
+                and ("type" in val)
+                and (val["type"] == TYPE)
+            ):
                 key = client.key(*val["key"])
                 entity = client.entity(key)
                 entity.update(val["properties"])

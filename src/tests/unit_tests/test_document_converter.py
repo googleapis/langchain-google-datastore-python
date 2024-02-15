@@ -31,12 +31,15 @@ from langchain_google_datastore.utility.document_converter import DocumentConver
             },
             Document(
                 page_content="{'field_1': 'data_1', 'field_2': 2}",
-                metadata={"key": ("foo", "bar")},
+                metadata={"key": {"path": ("foo", "bar"), "type": "datastore_type"}},
             ),
         ),
         (
             {"key": pytest.client.key(*("foo", "bar")), "properties": {}},
-            Document(page_content="", metadata={"key": ("foo", "bar")}),
+            Document(
+                page_content="",
+                metadata={"key": {"path": ("foo", "bar"), "type": "datastore_type"}},
+            ),
         ),
         (
             {
@@ -54,10 +57,10 @@ from langchain_google_datastore.utility.document_converter import DocumentConver
                 },
             },
             Document(
-                page_content="{'field_1': {'latitude': 1, 'longitude': 2}, "
-                + "'field_2': ['data', 2, {'nested': {'key': ('abc', 'xyz')}}], "
-                + "'field_3': {'key': ('NestedKind', 123), 'properties': {}}}",
-                metadata={"key": ("foo", "bar")},
+                page_content="{'field_1': {'latitude': 1, 'longitude': 2, 'type': 'datastore_type'}, "
+                + "'field_2': ['data', 2, {'nested': {'key': ('abc', 'xyz'), 'type': 'datastore_type'}}], "
+                + "'field_3': {'key': ('NestedKind', 123), 'properties': {}, 'type': 'datastore_type'}}",
+                metadata={"key": {"path": ("foo", "bar"), "type": "datastore_type"}},
             ),
         ),
     ],
@@ -81,7 +84,10 @@ def test_convert_firestore_entity_default_fields(entity_dict, langchain_doc) -> 
             },
             Document(
                 page_content="data",
-                metadata={"key": ("abc", "xyz"), "data_field": "data"},
+                metadata={
+                    "key": {"path": ("abc", "xyz"), "type": "datastore_type"},
+                    "data_field": "data",
+                },
             ),
             ["data_field"],
             ["data_field"],
@@ -93,7 +99,10 @@ def test_convert_firestore_entity_default_fields(entity_dict, langchain_doc) -> 
             },
             Document(
                 page_content="val",
-                metadata={"key": ("abc", "xyz"), "field_1": 1},
+                metadata={
+                    "key": {"path": ("abc", "xyz"), "type": "datastore_type"},
+                    "field_1": 1,
+                },
             ),
             ["field_2"],
             ["field_1"],
@@ -110,7 +119,10 @@ def test_convert_firestore_entity_default_fields(entity_dict, langchain_doc) -> 
             },
             Document(
                 page_content="{'field_2': 'val_2', 'field_3': 'val_3'}",
-                metadata={"key": ("abc", "xyz"), "field_1": "val_1"},
+                metadata={
+                    "key": {"path": ("abc", "xyz"), "type": "datastore_type"},
+                    "field_1": "val_1",
+                },
             ),
             ["field_2", "field_3"],
             ["field_1"],
@@ -128,7 +140,7 @@ def test_convert_firestore_entity_default_fields(entity_dict, langchain_doc) -> 
             Document(
                 page_content="{'field_2': 'val_2', 'field_3': 'val_3'}",
                 metadata={
-                    "key": ("abc", "xyz"),
+                    "key": {"path": ("abc", "xyz"), "type": "datastore_type"},
                     "field_1": "val_1",
                     "field_4": "val_4",
                 },
@@ -149,7 +161,7 @@ def test_convert_firestore_entity_default_fields(entity_dict, langchain_doc) -> 
             Document(
                 page_content="{'field_2': 'val_2', 'field_4': 'val_4'}",
                 metadata={
-                    "key": ("abc", "xyz"),
+                    "key": {"path": ("abc", "xyz"), "type": "datastore_type"},
                     "field_1": "val_1",
                     "field_3": "val_3",
                 },
@@ -176,8 +188,14 @@ def test_convert_firestore_entity_with_filters(
     "langchain_doc,entity_dict",
     [
         (
-            Document(page_content="value", metadata={"key": ("foo", "bar")}),
-            {"key": ("foo", "bar"), "properties": {"page_content": "value"}},
+            Document(
+                page_content="value",
+                metadata={"key": {"path": ("foo", "bar"), "type": "datastore_type"}},
+            ),
+            {
+                "key": {"path": ("foo", "bar"), "type": "datastore_type"},
+                "properties": {"page_content": "value"},
+            },
         ),
         (
             Document(page_content="value", metadata={"key": {}}),
@@ -200,12 +218,12 @@ def test_convert_firestore_entity_with_filters(
             Document(
                 page_content="value",
                 metadata={
-                    "key": ("foo", "bar"),
-                    "metadata_field": {"key": ("abc", "xyz")},
+                    "key": {"path": ("foo", "bar"), "type": "datastore_type"},
+                    "metadata_field": {"key": ("abc", "xyz"), "type": "datastore_type"},
                 },
             ),
             {
-                "key": ("foo", "bar"),
+                "key": {"path": ("foo", "bar"), "type": "datastore_type"},
                 "properties": {
                     "page_content": "value",
                     "metadata_field": pytest.client.key(*("abc", "xyz")),
@@ -215,10 +233,13 @@ def test_convert_firestore_entity_with_filters(
         (
             Document(
                 page_content='{"field_1": "val_1", "field_2": "val_2"}',
-                metadata={"key": ("foo", "bar"), "field_3": "val_3"},
+                metadata={
+                    "key": {"path": ("foo", "bar"), "type": "datastore_type"},
+                    "field_3": "val_3",
+                },
             ),
             {
-                "key": ("foo", "bar"),
+                "key": {"path": ("foo", "bar"), "type": "datastore_type"},
                 "properties": {
                     "field_1": "val_1",
                     "field_2": "val_2",
@@ -227,27 +248,33 @@ def test_convert_firestore_entity_with_filters(
             },
         ),
         (
-            Document(page_content="", metadata={"key": ("foo", "bar")}),
-            {"key": ("foo", "bar"), "properties": {}},
+            Document(
+                page_content="",
+                metadata={"key": {"path": ("foo", "bar"), "type": "datastore_type"}},
+            ),
+            {
+                "key": {"path": ("foo", "bar"), "type": "datastore_type"},
+                "properties": {},
+            },
         ),
         (
             Document(
                 page_content="",
                 metadata={
-                    "key": ("foo", "bar"),
-                    "point": {"latitude": 1, "longitude": 2},
+                    "key": {"path": ("foo", "bar"), "type": "datastore_type"},
+                    "point": {"latitude": 1, "longitude": 2, "type": "datastore_type"},
                     "field_2": "val_2",
                 },
             ),
             {
-                "key": ("foo", "bar"),
+                "key": {"path": ("foo", "bar"), "type": "datastore_type"},
                 "properties": {"point": GeoPoint(1, 2), "field_2": "val_2"},
             },
         ),
         (Document(page_content="", metadata={}), {"key": None, "properties": {}}),
         (
             Document(
-                page_content='{"array":[1, "data", {"k_1":"v_1", "k_point": {"latitude": 1, "longitude": 0}}], "f_2": 2}',
+                page_content='{"array":[1, "data", {"k_1":"v_1", "k_point": {"latitude": 1, "longitude": 0, "type": "datastore_type"}}], "f_2": 2}',
                 metadata={},
             ),
             {
@@ -272,7 +299,7 @@ def test_convert_langchain_document(langchain_doc, entity_dict):
     "entity_dict",
     [
         {
-            "key": ("foo", "bar"),
+            "key": pytest.client.key(*("foo", "bar")),
             "properties": {
                 "field_1": GeoPoint(1, 2),
                 "field_2": [
@@ -285,7 +312,8 @@ def test_convert_langchain_document(langchain_doc, entity_dict):
     ],
 )
 def test_roundtrip_firestore(entity_dict):
-    key = pytest.client.key(*entity_dict["key"])
+    key = entity_dict["key"]
+    key_expected = {"path": ("foo", "bar"), "type": "datastore_type"}
     entity = pytest.client.entity(key)
     entity.update(entity_dict["properties"])
 
@@ -295,4 +323,4 @@ def test_roundtrip_firestore(entity_dict):
     )
 
     assert roundtrip_doc["properties"] == entity_dict["properties"]
-    assert roundtrip_doc["key"] == entity_dict["key"]
+    assert roundtrip_doc["key"] == key_expected

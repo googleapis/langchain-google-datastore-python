@@ -26,6 +26,7 @@ from .utility.document_converter import DocumentConverter
 
 USER_AGENT = "langchain-google-datastore-python"
 WRITE_BATCH_SIZE = 500
+TYPE = "datastore_type"
 
 if TYPE_CHECKING:
     from google.cloud.datastore import Client, Query
@@ -119,8 +120,12 @@ class DatastoreSaver:
                 )
                 if self.kind:
                     key = self.client.key(self.kind)
-                elif entity_dict["key"]:
-                    key = self.client.key(*entity_dict["key"])
+                elif (
+                    entity_dict["key"]
+                    and ("type" in entity_dict["key"])
+                    and (entity_dict["key"]["type"] == TYPE)
+                ):
+                    key = self.client.key(*entity_dict["key"]["path"])
                 else:
                     continue
                 entity = self.client.entity(key)
@@ -150,8 +155,12 @@ class DatastoreSaver:
                     entity_dict = DocumentConverter.convertLangChainDocument(
                         doc, self.client
                     )
-                    if entity_dict["key"]:
-                        key = self.client.key(*entity_dict["key"])
+                    if (
+                        entity_dict["key"]
+                        and ("type" in entity_dict["key"])
+                        and (entity_dict["key"]["type"] == TYPE)
+                    ):
+                        key = self.client.key(*entity_dict["key"]["path"])
                 if not key:
                     continue
                 db_batch.delete(key)

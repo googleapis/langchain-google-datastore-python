@@ -85,7 +85,7 @@ def test_firestore_write_with_key(test_case: TestCase) -> None:
     expected_doc = [
         Document(
             page_content="{'f1': 1, 'f2': 2}",
-            metadata={"key": ("WriteRef", "doc")},
+            metadata={"key": {"path": ("WriteRef", "doc"), "type": "datastore_type"}},
         )
     ]
     saver.upsert_documents(expected_doc)
@@ -108,14 +108,14 @@ def test_firestore_delete_with_keys(test_case: TestCase) -> None:
     doc_to_insert = [
         Document(
             page_content="{'f1': 1, 'f2': 2}",
-            metadata={"key": ("WriteKind", "bar")},
+            metadata={"key": {"path": ("WriteKind", "bar"), "type": "datastore_type"}},
         )
     ]
 
     expected_doc = [
         Document(
             page_content="{'f1': 1, 'f2': 2}",
-            metadata={"key": ("WriteKind", "bar")},
+            metadata={"key": {"path": ("WriteKind", "bar"), "type": "datastore_type"}},
         )
     ]
     keys = [["WriteKind", "bar"]]
