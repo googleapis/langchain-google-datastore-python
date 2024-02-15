@@ -18,6 +18,7 @@ from typing import List
 from unittest import TestCase
 
 import pytest
+from google.cloud.datastore import Client
 from langchain_core.messages import AIMessage, HumanMessage
 
 from langchain_google_datastore import DatastoreChatMessageHistory
@@ -106,3 +107,44 @@ def test_firestore_multiple_sessions(test_case: TestCase) -> None:
 
     assert len(chat_history_1.messages) == 0
     assert len(chat_history_2.messages) == 0
+
+
+def test_firestore_reopen_session(test_case: TestCase) -> None:
+    kind = "Session"
+    session = uuid.uuid4().hex
+    chat_history = DatastoreChatMessageHistory(session_id=session, kind=kind)
+
+    chat_history.add_ai_message("AI message")
+    chat_history.add_user_message("Human message")
+
+    chat_history_reopen = DatastoreChatMessageHistory(session_id=session, kind=kind)
+
+    expected_messages = [
+        AIMessage(content="AI message"),
+        HumanMessage(content="Human message"),
+    ]
+
+    test_case.assertCountEqual(expected_messages, chat_history_reopen.messages)
+
+    chat_history.clear()
+    chat_history_reopen.clear()
+
+
+def test_firestore_custom_client(test_case: TestCase) -> None:
+    client = Client(namespace="namespace")
+    session_id = uuid.uuid4().hex
+    chat_history = DatastoreChatMessageHistory(
+        session_id=session_id, kind="Custom", client=client
+    )
+
+    chat_history.add_ai_message("AI message")
+    chat_history.add_user_message("User message")
+
+    expected_messages = [
+        AIMessage(content="AI message"),
+        HumanMessage(content="User message"),
+    ]
+
+    test_case.assertCountEqual(expected_messages, chat_history.messages)
+
+    chat_history.clear()

@@ -68,9 +68,7 @@ class DatastoreChatMessageHistory(BaseChatMessageHistory):
 
     def _upsert_messages(self) -> None:
         entity = self.client.entity(self.key)
-        entity["messages"] = {
-            "messages": MessageConverter.encode_messages(self.messages)
-        }
+        entity["messages"] = MessageConverter.encode_messages(self.messages)
         self.client.put(entity)
 
     def clear(self) -> None:
@@ -85,7 +83,7 @@ class MessageConverter:
 
     @staticmethod
     def decode_messages(messages: List[bytes]) -> List[BaseMessage]:
-        dict_messages = [json.loads(m) for m in messages]
+        dict_messages = [json.loads(m.decode()) for m in messages]
         return messages_from_dict(
             [{"type": m["type"], "data": m} for m in dict_messages]
         )
