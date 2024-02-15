@@ -19,7 +19,7 @@ from unittest import TestCase
 
 import pytest
 from google.cloud.datastore import Client
-from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
 from langchain_google_datastore import DatastoreChatMessageHistory
 
