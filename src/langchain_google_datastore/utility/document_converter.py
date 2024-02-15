@@ -39,53 +39,34 @@ class DocumentConverter:
         data_entity = dict(entity.items())
         metadata = {"key": {"path": entity.key.flat_path, "type": TYPE}}
 
-        set_page_properties = set(page_content_properties or [])
-        set_metadata_properties = set(metadata_properties or [])
-        shared_keys = set_metadata_properties & set_page_properties
+        set_page_properties = set(
+            page_content_properties or (data_entity.keys() - set(metadata_properties))
+        )
+        set_metadata_properties = set(
+            metadata_properties or (data_entity.keys() - set_page_properties)
+        )
 
         page_content = {}
-        for k in sorted(shared_keys):
-            if k in data_entity:
-                val = DocumentConverter._convertFromFirestore(data_entity.pop(k))
-                page_content[k] = val
-                metadata[k] = val
 
         metadata.update(
             {
-                k: DocumentConverter._convertFromFirestore(data_entity.pop(k))
-                for k in sorted(set_metadata_properties - shared_keys)
+                k: DocumentConverter._convertFromFirestore(data_entity[k])
+                for k in sorted(set_metadata_properties)
                 if k in data_entity
             }
         )
-        if not set_page_properties:
-            # write all properties
-            keys = sorted(data_entity.keys())
-            page_content = {
-                k: DocumentConverter._convertFromFirestore(data_entity.pop(k))
-                for k in keys
+        page_content.update(
+            {
+                k: DocumentConverter._convertFromFirestore(data_entity[k])
+                for k in sorted(set_page_properties)
+                if k in data_entity
             }
-        else:
-            page_content.update(
-                {
-                    k: DocumentConverter._convertFromFirestore(data_entity.pop(k))
-                    for k in sorted(set_page_properties - shared_keys)
-                    if k in data_entity
-                }
-            )
+        )
 
         if len(page_content) == 1:
             page_content = page_content.popitem()[1]
         elif not page_content:
             page_content = ""  # type: ignore
-
-        if not set_metadata_properties:
-            # metadata fields not specified. Write remaining fields into metadata
-            metadata.update(
-                {
-                    k: DocumentConverter._convertFromFirestore(v)
-                    for k, v in sorted(data_entity.items())
-                }
-            )
 
         doc = Document(page_content=str(page_content), metadata=metadata)
         return doc
