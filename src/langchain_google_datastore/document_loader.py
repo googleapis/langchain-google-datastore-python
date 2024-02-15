@@ -24,7 +24,6 @@ from langchain_core.documents import Document
 
 from .utility.document_converter import DocumentConverter
 
-DEFAULT_FIRESTORE_DATABASE = "(default)"
 USER_AGENT = "langchain-google-datastore-python"
 WRITE_BATCH_SIZE = 500
 
@@ -91,7 +90,7 @@ class DatastoreSaver:
     ) -> None:
         """Document Saver for Google Cloud Firestore.
         Args:
-            collection: The kind to write the entities into. If this
+            kind: The kind to write the entities into. If this
               value is present it will write entities with an auto generated id.
             client: Client for interacting with the Google Cloud Firestore API.
         """
