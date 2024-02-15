@@ -19,7 +19,7 @@ from unittest import TestCase
 
 import pytest
 from google.cloud.datastore import Client
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
 
 from langchain_google_datastore import DatastoreChatMessageHistory
 
@@ -58,7 +58,7 @@ def test_firestore_load_messages(test_case: TestCase) -> None:
         session_id=session_id, kind="HistoryLoad"
     )
 
-    expected_messages: List[AIMessage | HumanMessage] = []
+    expected_messages: List[BaseMessage] = []
 
     for i in range(NUM_MESSAGES):
         ai_m = AIMessage(content=f"AI message: {i}")

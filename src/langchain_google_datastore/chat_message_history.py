@@ -39,15 +39,12 @@ class DatastoreChatMessageHistory(BaseChatMessageHistory):
         Args:
             session_id: Arbitrary key that is used to store the messages of a single
                 chat session. This is the identifier of an entity.
-            kind: The name of the Datastore kind to write into.
+            kind: The name of the Datastore kind to write into. This is an optional value
+                and by default it will use `ChatHistory` as the kind.
             client: Client for interacting with the Google Cloud Firestore API.
         """
-        if client:
-            self.client = client
-            self.client._client_info.user_agent = USER_AGENT
-        else:
-            self.client = datastore.Client()
-            self.client._client_info.user_agent = USER_AGENT
+        self.client = client or datastore.Client()
+        self.client._client_info.user_agent = USER_AGENT
         self.session_id = session_id
         self.key = self.client.key(kind, session_id)
         self.messages: List[BaseMessage] = []
