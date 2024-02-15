@@ -51,13 +51,8 @@ class DatastoreLoader(BaseLoader):
                 By default it will write all fields that are not in `page_content` into `metadata`.
             client: Client for interacting with the Google Cloud Firestore API.
         """
-        if client:
-            self.client = client
-            self.client._client_info.user_agent = USER_AGENT
-        else:
-            self.client = datastore.Client()
-            self.client._client_info.user_agent = USER_AGENT
-
+        self.client = client or datastore.Client()
+        self.client._client_info.user_agent = USER_AGENT
         self.source = source
         self.page_content_properties = page_content_properties
         self.metadata_properties = metadata_properties
