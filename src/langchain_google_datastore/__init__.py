@@ -13,6 +13,5 @@
 # limitations under the License.
 
 from langchain_google_datastore.document_loader import DatastoreLoader, DatastoreSaver
-from langchain_google_datastore.utility.document_converter import DocumentConverter
 
 __all__ = ["DatastoreLoader", "DatastoreSaver"]

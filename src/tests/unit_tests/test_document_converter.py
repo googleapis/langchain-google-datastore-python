@@ -18,7 +18,10 @@ from google.cloud import datastore
 from google.cloud.datastore.helpers import GeoPoint
 from langchain_core.documents import Document
 
-from langchain_google_datastore.utility.document_converter import DocumentConverter
+from langchain_google_datastore.document_converter import (
+    convert_firestore_entity,
+    convert_langchain_document,
+)
 
 
 @pytest.mark.parametrize(
@@ -69,7 +72,7 @@ def test_convert_firestore_entity_default_fields(entity_dict, langchain_doc) -> 
     entity = pytest.client.entity(entity_dict["key"])
     entity.update(entity_dict["properties"])
 
-    return_doc = DocumentConverter.convertFirestoreEntity(entity)
+    return_doc = convert_firestore_entity(entity)
 
     assert return_doc == langchain_doc
 
@@ -177,7 +180,7 @@ def test_convert_firestore_entity_with_filters(
     entity = pytest.client.entity(entity_dict["key"])
     entity.update(entity_dict["properties"])
 
-    return_doc = DocumentConverter.convertFirestoreEntity(
+    return_doc = convert_firestore_entity(
         entity, page_content_properties, metadata_properties
     )
 
@@ -288,9 +291,7 @@ def test_convert_firestore_entity_with_filters(
     ],
 )
 def test_convert_langchain_document(langchain_doc, entity_dict):
-    return_doc = DocumentConverter.convertLangChainDocument(
-        langchain_doc, pytest.client
-    )
+    return_doc = convert_langchain_document(langchain_doc, pytest.client)
 
     assert return_doc == entity_dict
 
@@ -317,10 +318,8 @@ def test_roundtrip_firestore(entity_dict):
     entity = pytest.client.entity(key)
     entity.update(entity_dict["properties"])
 
-    langchain_doc = DocumentConverter.convertFirestoreEntity(entity)
-    roundtrip_doc = DocumentConverter.convertLangChainDocument(
-        langchain_doc, pytest.client
-    )
+    langchain_doc = convert_firestore_entity(entity)
+    roundtrip_doc = convert_langchain_document(langchain_doc, pytest.client)
 
     assert roundtrip_doc["properties"] == entity_dict["properties"]
     assert roundtrip_doc["key"] == key_expected

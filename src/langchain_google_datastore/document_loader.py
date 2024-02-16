@@ -22,7 +22,7 @@ from google.cloud import datastore
 from langchain_community.document_loaders.base import BaseLoader
 from langchain_core.documents import Document
 
-from .utility.document_converter import DocumentConverter
+from .document_converter import convert_firestore_entity, convert_langchain_document
 
 USER_AGENT_LOADER = "langchain-google-datastore-python:document_loader"
 USER_AGENT_SAVER = "langchain-google-datastore-python:document_saver"
@@ -84,7 +84,7 @@ class DatastoreLoader(BaseLoader):
                 )
 
         for entity in query.fetch():
-            yield DocumentConverter.convertFirestoreEntity(
+            yield convert_firestore_entity(
                 entity, self.page_content_properties, self.metadata_properties
             )
 
@@ -125,9 +125,7 @@ class DatastoreSaver:
             db_batch = self.client.batch()
             db_batch.begin()
             for doc in batch:
-                entity_dict = DocumentConverter.convertLangChainDocument(
-                    doc, self.client
-                )
+                entity_dict = convert_langchain_document(doc, self.client)
                 if self.kind:
                     key = self.client.key(self.kind)
                 elif (
@@ -162,9 +160,7 @@ class DatastoreSaver:
                 if key_path:
                     key = self.client.key(*key_path)
                 elif doc:
-                    entity_dict = DocumentConverter.convertLangChainDocument(
-                        doc, self.client
-                    )
+                    entity_dict = convert_langchain_document(doc, self.client)
                     if (
                         entity_dict["key"]
                         and ("type" in entity_dict["key"])
