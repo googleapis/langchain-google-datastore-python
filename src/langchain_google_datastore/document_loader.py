@@ -24,7 +24,8 @@ from langchain_core.documents import Document
 
 from .utility.document_converter import DocumentConverter
 
-USER_AGENT = "langchain-google-datastore-python"
+USER_AGENT_LOADER = "langchain-google-datastore-python:document_loader"
+USER_AGENT_SAVER = "langchain-google-datastore-python:document_saver"
 WRITE_BATCH_SIZE = 500
 TYPE = "datastore_type"
 
@@ -52,7 +53,13 @@ class DatastoreLoader(BaseLoader):
             client: Client for interacting with the Google Cloud Firestore API.
         """
         self.client = client or datastore.Client()
-        self.client._client_info.user_agent = USER_AGENT
+        client_agent = self.client._client_info.user_agent
+        if not client_agent:
+            self.client._client_info.usert_agent = USER_AGENT_LOADER
+        elif USER_AGENT_LOADER not in client_agent:
+            self.client._client_info.user_agent = " ".join(
+                [client_agent, USER_AGENT_LOADER]
+            )
         self.source = source
         self.page_content_properties = page_content_properties
         self.metadata_properties = metadata_properties
@@ -68,7 +75,13 @@ class DatastoreLoader(BaseLoader):
             query = self.client.query(kind=self.source)
         else:
             query = self.source
-            query._client._client_info.user_agent = USER_AGENT
+            client_agent = query._client._client_info.user_agent
+            if not client_agent:
+                query._client._client_info.user_agent = USER_AGENT_LOADER
+            elif USER_AGENT_LOADER not in client_agent:
+                query._client._client_info.user_agent = " ".join(
+                    [client_agent, USER_AGENT_LOADER]
+                )
 
         for entity in query.fetch():
             yield DocumentConverter.convertFirestoreEntity(
@@ -91,12 +104,14 @@ class DatastoreSaver:
             client: Client for interacting with the Google Cloud Firestore API.
         """
         self.kind = kind
-        if client:
-            self.client = client
-            self.client._client_info.user_agent = USER_AGENT
-        else:
-            self.client = datastore.Client()
-            self.client._client_info.user_agent = USER_AGENT
+        self.client = client or datastore.Client()
+        client_agent = self.client._client_info.user_agent
+        if not client_agent:
+            self.client._client_info.user_agent = USER_AGENT_SAVER
+        elif USER_AGENT_SAVER not in client_agent:
+            self.client._client_info.user_agent = " ".join(
+                [client_agent, USER_AGENT_SAVER]
+            )
 
     def upsert_documents(
         self,
