@@ -14,8 +14,8 @@
 
 from __future__ import annotations
 
-import ast
 import itertools
+import json
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Dict, List
 
@@ -28,11 +28,10 @@ if TYPE_CHECKING:
     from google.cloud.datastore import Client, Entity
 
 
-class TypeEnum(StrEnum):
-    DATASTORE_TYPE = "datastore_type"
-    KEY = "key"
-    ENTITY = "entity"
-    GEOPOINT = "geopoint"
+DATASTORE_TYPE = "datastore_type"
+KEY = "key"
+ENTITY = "entity"
+GEOPOINT = "geopoint"
 
 
 def convert_firestore_entity(
@@ -44,7 +43,7 @@ def convert_firestore_entity(
     metadata = {
         "key": {
             "path": entity.key.flat_path,
-            TypeEnum.DATASTORE_TYPE.value: TypeEnum.KEY.value,
+            DATASTORE_TYPE: KEY,
         }
     }
 
@@ -62,14 +61,20 @@ def convert_firestore_entity(
             metadata[k] = _convert_from_firestore(data_entity[k])
     for k in sorted(set_page_properties):
         if k in data_entity:
+            print("--here")
             page_content[k] = _convert_from_firestore(data_entity[k])
+            print(page_content)
+            print("--here")
 
     if len(page_content) == 1:
-        page_content = page_content.popitem()[1]
-    elif not page_content:
-        page_content = ""  # type: ignore
+        page_content = str(page_content.popitem()[1])  # type: ignore
+    else:
+        page_content = json.dumps(page_content)  # type: ignore
 
-    doc = Document(page_content=str(page_content), metadata=metadata)
+    print("--after conversion hhere")
+    print(page_content)
+    print("--after conversion hhere")
+    doc = Document(page_content=page_content, metadata=metadata)  # type: ignore
     return doc
 
 
@@ -78,10 +83,7 @@ def convert_langchain_document(document: Document, client: Client) -> dict:
     path = None
     data = {}
 
-    if (
-        metadata.get("key")
-        and metadata["key"].get(TypeEnum.DATASTORE_TYPE.value) == TypeEnum.KEY.value
-    ):
+    if metadata.get("key", {}).get(DATASTORE_TYPE) == KEY:
         path = metadata["key"]
         metadata.pop("key")
 
@@ -90,7 +92,7 @@ def convert_langchain_document(document: Document, client: Client) -> dict:
 
     if document.page_content:
         try:
-            content_dict = ast.literal_eval(document.page_content)
+            content_dict = json.loads(document.page_content)
         except (ValueError, SyntaxError):
             content_dict = {"page_content": document.page_content}
         converted_page = _convert_from_langchain(content_dict, client)
@@ -108,19 +110,19 @@ def _convert_from_firestore(val: Any) -> Any:
     elif isinstance(val, Key):
         val_converted = {
             "key": val.flat_path,
-            TypeEnum.DATASTORE_TYPE.value: TypeEnum.KEY.value,
+            DATASTORE_TYPE: KEY,
         }
     elif isinstance(val, GeoPoint):
         val_converted = {
             "latitude": val.latitude,
             "longitude": val.longitude,
-            TypeEnum.DATASTORE_TYPE.value: TypeEnum.GEOPOINT.value,
+            DATASTORE_TYPE: GEOPOINT,
         }
     elif isinstance(val, Entity):
         val_converted = {
             "key": val.key.flat_path,
             "properties": _convert_from_firestore(dict(val.items())),
-            TypeEnum.DATASTORE_TYPE.value: TypeEnum.ENTITY.value,
+            DATASTORE_TYPE: ENTITY,
         }
 
     return val_converted
@@ -132,11 +134,11 @@ def _convert_from_langchain(val: Any, client: Client) -> Any:
         val_converted = [_convert_from_langchain(v, client) for v in val]
     elif isinstance(val, dict):
         l = len(val)
-        if val.get(TypeEnum.DATASTORE_TYPE.value) == TypeEnum.KEY.value:
+        if val.get(DATASTORE_TYPE) == KEY:
             val_converted = client.key(*val["key"])
-        elif val.get(TypeEnum.DATASTORE_TYPE.value) == TypeEnum.GEOPOINT.value:
+        elif val.get(DATASTORE_TYPE) == GEOPOINT:
             val_converted = GeoPoint(val["latitude"], val["longitude"])
-        elif val.get(TypeEnum.DATASTORE_TYPE.value) == TypeEnum.ENTITY.value:
+        elif val.get(DATASTORE_TYPE) == ENTITY:
             key = client.key(*val["key"])
             entity = client.entity(key)
             entity.update(val["properties"])

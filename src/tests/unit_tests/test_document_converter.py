@@ -19,7 +19,9 @@ from google.cloud.datastore.helpers import GeoPoint
 from langchain_core.documents import Document
 
 from langchain_google_datastore.document_converter import (
-    TypeEnum,
+    DATASTORE_TYPE,
+    GEOPOINT,
+    KEY,
     convert_firestore_entity,
     convert_langchain_document,
 )
@@ -34,11 +36,11 @@ from langchain_google_datastore.document_converter import (
                 "properties": {"field_1": "data_1", "field_2": 2},
             },
             Document(
-                page_content="{'field_1': 'data_1', 'field_2': 2}",
+                page_content='{"field_1": "data_1", "field_2": 2}',
                 metadata={
                     "key": {
                         "path": ("foo", "bar"),
-                        TypeEnum.DATASTORE_TYPE.value: "key",
+                        DATASTORE_TYPE: KEY,
                     }
                 },
             ),
@@ -46,11 +48,11 @@ from langchain_google_datastore.document_converter import (
         (
             {"key": pytest.client.key(*("foo", "bar")), "properties": {}},
             Document(
-                page_content="",
+                page_content="{}",
                 metadata={
                     "key": {
                         "path": ("foo", "bar"),
-                        TypeEnum.DATASTORE_TYPE.value: "key",
+                        DATASTORE_TYPE: KEY,
                     }
                 },
             ),
@@ -71,13 +73,13 @@ from langchain_google_datastore.document_converter import (
                 },
             },
             Document(
-                page_content="{'field_1': {'latitude': 1, 'longitude': 2, 'datastore_type': 'geopoint'}, "
-                + "'field_2': ['data', 2, {'nested': {'key': ('abc', 'xyz'), 'datastore_type': 'key'}}], "
-                + "'field_3': {'key': ('NestedKind', 123), 'properties': {}, 'datastore_type': 'entity'}}",
+                page_content='{"field_1": {"latitude": 1, "longitude": 2, "datastore_type": "geopoint"}, '
+                + '"field_2": ["data", 2, {"nested": {"key": ["abc", "xyz"], "datastore_type": "key"}}], '
+                + '"field_3": {"key": ["NestedKind", 123], "properties": {}, "datastore_type": "entity"}}',
                 metadata={
                     "key": {
                         "path": ("foo", "bar"),
-                        TypeEnum.DATASTORE_TYPE.value: "key",
+                        DATASTORE_TYPE: KEY,
                     }
                 },
             ),
@@ -89,6 +91,9 @@ def test_convert_firestore_entity_default_fields(entity_dict, langchain_doc) -> 
     entity.update(entity_dict["properties"])
 
     return_doc = convert_firestore_entity(entity)
+    print("debug")
+    print(return_doc)
+    print(langchain_doc)
 
     assert return_doc == langchain_doc
 
@@ -106,7 +111,7 @@ def test_convert_firestore_entity_default_fields(entity_dict, langchain_doc) -> 
                 metadata={
                     "key": {
                         "path": ("abc", "xyz"),
-                        TypeEnum.DATASTORE_TYPE.value: "key",
+                        DATASTORE_TYPE: KEY,
                     },
                     "data_field": "data",
                 },
@@ -124,7 +129,7 @@ def test_convert_firestore_entity_default_fields(entity_dict, langchain_doc) -> 
                 metadata={
                     "key": {
                         "path": ("abc", "xyz"),
-                        TypeEnum.DATASTORE_TYPE.value: "key",
+                        DATASTORE_TYPE: KEY,
                     },
                     "field_1": 1,
                 },
@@ -143,11 +148,11 @@ def test_convert_firestore_entity_default_fields(entity_dict, langchain_doc) -> 
                 },
             },
             Document(
-                page_content="{'field_2': 'val_2', 'field_3': 'val_3'}",
+                page_content='{"field_2": "val_2", "field_3": "val_3"}',
                 metadata={
                     "key": {
                         "path": ("abc", "xyz"),
-                        TypeEnum.DATASTORE_TYPE.value: "key",
+                        DATASTORE_TYPE: KEY,
                     },
                     "field_1": "val_1",
                 },
@@ -166,11 +171,11 @@ def test_convert_firestore_entity_default_fields(entity_dict, langchain_doc) -> 
                 },
             },
             Document(
-                page_content="{'field_2': 'val_2', 'field_3': 'val_3'}",
+                page_content='{"field_2": "val_2", "field_3": "val_3"}',
                 metadata={
                     "key": {
                         "path": ("abc", "xyz"),
-                        TypeEnum.DATASTORE_TYPE.value: "key",
+                        DATASTORE_TYPE: KEY,
                     },
                     "field_1": "val_1",
                     "field_4": "val_4",
@@ -190,11 +195,11 @@ def test_convert_firestore_entity_default_fields(entity_dict, langchain_doc) -> 
                 },
             },
             Document(
-                page_content="{'field_2': 'val_2', 'field_4': 'val_4'}",
+                page_content='{"field_2": "val_2", "field_4": "val_4"}',
                 metadata={
                     "key": {
                         "path": ("abc", "xyz"),
-                        TypeEnum.DATASTORE_TYPE.value: "key",
+                        DATASTORE_TYPE: KEY,
                     },
                     "field_1": "val_1",
                     "field_3": "val_3",
@@ -227,12 +232,12 @@ def test_convert_firestore_entity_with_filters(
                 metadata={
                     "key": {
                         "path": ("foo", "bar"),
-                        TypeEnum.DATASTORE_TYPE.value: "key",
+                        DATASTORE_TYPE: "key",
                     }
                 },
             ),
             {
-                "key": {"path": ("foo", "bar"), TypeEnum.DATASTORE_TYPE.value: "key"},
+                "key": {"path": ("foo", "bar"), DATASTORE_TYPE: KEY},
                 "properties": {"page_content": "value"},
             },
         ),
@@ -259,16 +264,16 @@ def test_convert_firestore_entity_with_filters(
                 metadata={
                     "key": {
                         "path": ("foo", "bar"),
-                        TypeEnum.DATASTORE_TYPE.value: "key",
+                        DATASTORE_TYPE: KEY,
                     },
                     "metadata_field": {
                         "key": ("abc", "xyz"),
-                        TypeEnum.DATASTORE_TYPE.value: "key",
+                        DATASTORE_TYPE: KEY,
                     },
                 },
             ),
             {
-                "key": {"path": ("foo", "bar"), TypeEnum.DATASTORE_TYPE.value: "key"},
+                "key": {"path": ("foo", "bar"), DATASTORE_TYPE: KEY},
                 "properties": {
                     "page_content": "value",
                     "metadata_field": pytest.client.key(*("abc", "xyz")),
@@ -281,13 +286,13 @@ def test_convert_firestore_entity_with_filters(
                 metadata={
                     "key": {
                         "path": ("foo", "bar"),
-                        TypeEnum.DATASTORE_TYPE.value: "key",
+                        DATASTORE_TYPE: KEY,
                     },
                     "field_3": "val_3",
                 },
             ),
             {
-                "key": {"path": ("foo", "bar"), TypeEnum.DATASTORE_TYPE.value: "key"},
+                "key": {"path": ("foo", "bar"), DATASTORE_TYPE: KEY},
                 "properties": {
                     "field_1": "val_1",
                     "field_2": "val_2",
@@ -301,12 +306,12 @@ def test_convert_firestore_entity_with_filters(
                 metadata={
                     "key": {
                         "path": ("foo", "bar"),
-                        TypeEnum.DATASTORE_TYPE.value: "key",
+                        DATASTORE_TYPE: KEY,
                     }
                 },
             ),
             {
-                "key": {"path": ("foo", "bar"), TypeEnum.DATASTORE_TYPE.value: "key"},
+                "key": {"path": ("foo", "bar"), DATASTORE_TYPE: KEY},
                 "properties": {},
             },
         ),
@@ -316,18 +321,18 @@ def test_convert_firestore_entity_with_filters(
                 metadata={
                     "key": {
                         "path": ("foo", "bar"),
-                        TypeEnum.DATASTORE_TYPE.value: "key",
+                        DATASTORE_TYPE: KEY,
                     },
                     "point": {
                         "latitude": 1,
                         "longitude": 2,
-                        TypeEnum.DATASTORE_TYPE.value: "geopoint",
+                        DATASTORE_TYPE: GEOPOINT,
                     },
                     "field_2": "val_2",
                 },
             ),
             {
-                "key": {"path": ("foo", "bar"), TypeEnum.DATASTORE_TYPE.value: "key"},
+                "key": {"path": ("foo", "bar"), DATASTORE_TYPE: KEY},
                 "properties": {"point": GeoPoint(1, 2), "field_2": "val_2"},
             },
         ),
@@ -371,7 +376,7 @@ def test_convert_langchain_document(langchain_doc, entity_dict):
 )
 def test_roundtrip_firestore(entity_dict):
     key = entity_dict["key"]
-    key_expected = {"path": ("foo", "bar"), TypeEnum.DATASTORE_TYPE.value: "key"}
+    key_expected = {"path": ("foo", "bar"), DATASTORE_TYPE: KEY}
     entity = pytest.client.entity(key)
     entity.update(entity_dict["properties"])
 

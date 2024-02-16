@@ -23,7 +23,8 @@ from langchain_community.document_loaders.base import BaseLoader
 from langchain_core.documents import Document
 
 from .document_converter import (
-    TypeEnum,
+    DATASTORE_TYPE,
+    KEY,
     convert_firestore_entity,
     convert_langchain_document,
 )
@@ -53,7 +54,7 @@ class DatastoreLoader(BaseLoader):
                 `page_content`. When only one field is provided only the value is written.
             metadata_properties: The properties to write into the `metadata`.
                 By default it will write all fields that are not in `page_content` into `metadata`.
-            client: Client for interacting with the Google Cloud Firestore API.
+            client: Client for interacting with the Google Cloud Datastore API.
         """
         self.client = client_with_user_agent(client, USER_AGENT_LOADER)
         self.source = source
@@ -87,11 +88,11 @@ class DatastoreSaver:
         kind: Optional[str] = None,
         client: Optional[Client] = None,
     ) -> None:
-        """Document Saver for Google Cloud Firestore.
+        """Document Saver for Google Cloud Firestore in Datastore Mode.
         Args:
             kind: The kind to write the entities into. If this
               value is present it will write entities with an auto generated id.
-            client: Client for interacting with the Google Cloud Firestore API.
+            client: Client for interacting with the Google Cloud Datastore API.
         """
         self.kind = kind
         self.client = client_with_user_agent(client, USER_AGENT_SAVER)
@@ -102,7 +103,7 @@ class DatastoreSaver:
     ) -> None:
         """Create / merge documents into the Firestore database in Datastore Mode.
         Args:
-         documents: List of documents to be written into Firestore.
+         documents: List of documents to be written into Datastore.
         """
         for batch in more_itertools.chunked(documents, WRITE_BATCH_SIZE):
             db_batch = self.client.batch()
@@ -111,11 +112,7 @@ class DatastoreSaver:
                 entity_dict = convert_langchain_document(doc, self.client)
                 if self.kind:
                     key = self.client.key(self.kind)
-                elif (
-                    entity_dict.get("key")
-                    and entity_dict["key"].get(TypeEnum.DATASTORE_TYPE.value)
-                    == TypeEnum.KEY.value
-                ):
+                elif entity_dict.get("key", {}).get(DATASTORE_TYPE) == KEY:
                     key = self.client.key(*entity_dict["key"]["path"])
                 else:
                     raise ValueError(
@@ -129,11 +126,11 @@ class DatastoreSaver:
     def delete_documents(
         self, documents: List[Document], keys: Optional[List[List[str]]] = None
     ) -> None:
-        """Delete documents from the Firestore database.
+        """Delete documents from the Datastore database.
         Args:
-          documents: List of documents to be deleted from Firestore. It will try to create
+          documents: List of documents to be deleted from Datastore . It will try to create
             the entity key from the `key` in the document metadata.
-          keys: List of Key paths to be delted from Firestore. If provided `documents` will
+          keys: List of Key paths to be delted from Datastore. If provided `documents` will
             be ignored.
         """
         docs_list = itertools.zip_longest(documents, keys or [])
@@ -146,11 +143,7 @@ class DatastoreSaver:
                     key = self.client.key(*key_path)
                 elif doc:
                     entity_dict = convert_langchain_document(doc, self.client)
-                    if (
-                        entity_dict.get("key")
-                        and entity_dict["key"].get(TypeEnum.DATASTORE_TYPE.value)
-                        == TypeEnum.KEY.value
-                    ):
+                    if entity_dict.get("key", {}).get(DATASTORE_TYPE) == KEY:
                         key = self.client.key(*entity_dict["key"]["path"])
                 if not key:
                     raise ValueError(
