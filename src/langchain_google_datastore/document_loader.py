@@ -118,7 +118,9 @@ class DatastoreSaver:
                 ):
                     key = self.client.key(*entity_dict["key"]["path"])
                 else:
-                    continue
+                    raise ValueError(
+                        "Unable to construct key for document: " + str(doc)
+                    )
                 entity = self.client.entity(key)
                 entity.update(entity_dict["properties"])
                 db_batch.put(entity)
@@ -151,7 +153,12 @@ class DatastoreSaver:
                     ):
                         key = self.client.key(*entity_dict["key"]["path"])
                 if not key:
-                    continue
+                    raise ValueError(
+                        "Unable to construct key for document: "
+                        + str(doc)
+                        + " or key: "
+                        + str(key_path)
+                    )
                 db_batch.delete(key)
             db_batch.commit()
 
