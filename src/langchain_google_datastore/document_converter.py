@@ -57,20 +57,12 @@ def convert_firestore_entity(
 
     page_content = {}
 
-    metadata.update(
-        {
-            k: _convert_from_firestore(data_entity[k])
-            for k in sorted(set_metadata_properties)
-            if k in data_entity
-        }
-    )
-    page_content.update(
-        {
-            k: _convert_from_firestore(data_entity[k])
-            for k in sorted(set_page_properties)
-            if k in data_entity
-        }
-    )
+    for k in sorted(set_metadata_properties):
+        if k in data_entity:
+            metadata[k] = _convert_from_firestore(data_entity[k])
+    for k in sorted(set_page_properties):
+        if k in data_entity:
+            page_content[k] = _convert_from_firestore(data_entity[k])
 
     if len(page_content) == 1:
         page_content = page_content.popitem()[1]
@@ -109,7 +101,11 @@ def convert_langchain_document(document: Document, client: Client) -> dict:
 
 def _convert_from_firestore(val: Any) -> Any:
     val_converted = val
-    if isinstance(val, Key):
+    if isinstance(val, dict):
+        val_converted = {k: _convert_from_firestore(v) for k, v in val.items()}
+    if isinstance(val, list):
+        val_converted = [_convert_from_firestore(v) for v in val]
+    elif isinstance(val, Key):
         val_converted = {
             "key": val.flat_path,
             TypeEnum.DATASTORE_TYPE.value: TypeEnum.KEY.value,
@@ -126,17 +122,15 @@ def _convert_from_firestore(val: Any) -> Any:
             "properties": _convert_from_firestore(dict(val.items())),
             TypeEnum.DATASTORE_TYPE.value: TypeEnum.ENTITY.value,
         }
-    elif isinstance(val, dict):
-        val_converted = {k: _convert_from_firestore(v) for k, v in val.items()}
-    elif isinstance(val, list):
-        val_converted = [_convert_from_firestore(v) for v in val]
 
     return val_converted
 
 
 def _convert_from_langchain(val: Any, client: Client) -> Any:
     val_converted = val
-    if isinstance(val, dict):
+    if isinstance(val, list):
+        val_converted = [_convert_from_langchain(v, client) for v in val]
+    elif isinstance(val, dict):
         l = len(val)
         if val.get(TypeEnum.DATASTORE_TYPE.value) == TypeEnum.KEY.value:
             val_converted = client.key(*val["key"])
@@ -151,6 +145,4 @@ def _convert_from_langchain(val: Any, client: Client) -> Any:
             val_converted = {
                 k: _convert_from_langchain(v, client) for k, v in val.items()
             }
-    elif isinstance(val, list):
-        val_converted = [_convert_from_langchain(v, client) for v in val]
     return val_converted
