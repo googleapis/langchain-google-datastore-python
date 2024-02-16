@@ -21,7 +21,7 @@ from google.cloud import datastore
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.messages import BaseMessage, messages_from_dict
 
-USER_AGENT = "langchain-google-datastore-python"
+USER_AGENT = "langchain-google-datastore-python:chat_history"
 DEFAULT_KIND = "ChatHistory"
 
 if TYPE_CHECKING:
@@ -44,7 +44,11 @@ class DatastoreChatMessageHistory(BaseChatMessageHistory):
             client: Client for interacting with the Google Cloud Firestore API.
         """
         self.client = client or datastore.Client()
-        self.client._client_info.user_agent = USER_AGENT
+        client_agent = self.client._client_info.user_agent
+        if not client_agent:
+            self.client._client_info.user_agent = USER_AGENT
+        elif USER_AGENT not in client_agent:
+            self.client._client_info.user_agent = " ".join([client_agent, USER_AGENT])
         self.session_id = session_id
         self.key = self.client.key(kind, session_id)
         self.messages: List[BaseMessage] = []
