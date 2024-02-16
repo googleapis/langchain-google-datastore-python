@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from langchain_google_datastore.chat_message_history import DatastoreChatMessageHistory
-from langchain_google_datastore.document_loader import DatastoreLoader, DatastoreSaver
+from unittest import TestCase
+
+import pytest
+from google.cloud.datastore import Client
 
 
-__all__ = ["DatastoreChatMessageHistory", "DatastoreLoader", "DatastoreSaver"]
+def pytest_configure():
+    pytest.client: Client = Client()
