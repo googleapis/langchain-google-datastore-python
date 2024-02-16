@@ -59,9 +59,7 @@ class DatastoreChatMessageHistory(BaseChatMessageHistory):
         if entity:
             data_entity = dict(entity.items())
             if "messages" in data_entity:
-                self.messages = decode_messages(
-                    data_entity["messages"]
-                )
+                self.messages = decode_messages(data_entity["messages"])
 
     def add_message(self, message: BaseMessage) -> None:
         self.messages.append(message)
