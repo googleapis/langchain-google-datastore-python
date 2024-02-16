@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from langchain_google_datastore.document_loader import DatastoreLoader, DatastoreSaver
+from .document_loader import DatastoreLoader, DatastoreSaver
+from .version import __version__
 
-__all__ = ["DatastoreLoader", "DatastoreSaver"]
+__all__ = ["DatastoreLoader", "DatastoreSaver", "__version__"]
