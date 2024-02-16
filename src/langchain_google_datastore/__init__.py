@@ -15,5 +15,4 @@
 from langchain_google_datastore.chat_message_history import DatastoreChatMessageHistory
 from langchain_google_datastore.document_loader import DatastoreLoader, DatastoreSaver
 
-
 __all__ = ["DatastoreChatMessageHistory", "DatastoreLoader", "DatastoreSaver"]
