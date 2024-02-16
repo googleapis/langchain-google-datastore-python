@@ -16,4 +16,9 @@ from .chat_message_history import DatastoreChatMessageHistory
 from .document_loader import DatastoreLoader, DatastoreSaver
 from .version import __version__
 
-__all__ = ["DatastoreChatMessageHistory", "DatastoreLoader", "DatastoreSaver", "__version__"]
+__all__ = [
+    "DatastoreChatMessageHistory",
+    "DatastoreLoader",
+    "DatastoreSaver",
+    "__version__",
+]
