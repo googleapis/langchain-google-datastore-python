@@ -52,14 +52,7 @@ class DatastoreLoader(BaseLoader):
                 By default it will write all fields that are not in `page_content` into `metadata`.
             client: Client for interacting with the Google Cloud Firestore API.
         """
-        self.client = client or datastore.Client()
-        client_agent = self.client._client_info.user_agent
-        if not client_agent:
-            self.client._client_info.usert_agent = USER_AGENT_LOADER
-        elif USER_AGENT_LOADER not in client_agent:
-            self.client._client_info.user_agent = " ".join(
-                [client_agent, USER_AGENT_LOADER]
-            )
+        self.client = client_with_user_agent(client, USER_AGENT_LOADER)
         self.source = source
         self.page_content_properties = page_content_properties
         self.metadata_properties = metadata_properties
@@ -75,13 +68,7 @@ class DatastoreLoader(BaseLoader):
             query = self.client.query(kind=self.source)
         else:
             query = self.source
-            client_agent = query._client._client_info.user_agent
-            if not client_agent:
-                query._client._client_info.user_agent = USER_AGENT_LOADER
-            elif USER_AGENT_LOADER not in client_agent:
-                query._client._client_info.user_agent = " ".join(
-                    [client_agent, USER_AGENT_LOADER]
-                )
+            query._client = client_with_user_agent(query._client, USER_AGENT_LOADER)
 
         for entity in query.fetch():
             yield convert_firestore_entity(
@@ -104,14 +91,7 @@ class DatastoreSaver:
             client: Client for interacting with the Google Cloud Firestore API.
         """
         self.kind = kind
-        self.client = client or datastore.Client()
-        client_agent = self.client._client_info.user_agent
-        if not client_agent:
-            self.client._client_info.user_agent = USER_AGENT_SAVER
-        elif USER_AGENT_SAVER not in client_agent:
-            self.client._client_info.user_agent = " ".join(
-                [client_agent, USER_AGENT_SAVER]
-            )
+        self.client = client_with_user_agent(client, USER_AGENT_SAVER)
 
     def upsert_documents(
         self,
@@ -171,3 +151,14 @@ class DatastoreSaver:
                     continue
                 db_batch.delete(key)
             db_batch.commit()
+
+
+def client_with_user_agent(client: Client, user_agent: str) -> Client:
+    if not client:
+        client = datastore.Client()
+    client_agent = client._client_info.user_agent
+    if not client_agent:
+        client._client_info.user_agent = user_agent
+    elif user_agent not in client_agent:
+        client._client_info.user_agent = " ".join([client_agent, user_agent])
+    return client
