@@ -22,12 +22,15 @@ from google.cloud import datastore
 from langchain_community.document_loaders.base import BaseLoader
 from langchain_core.documents import Document
 
-from .document_converter import convert_firestore_entity, convert_langchain_document
+from .document_converter import (
+    TypeEnum,
+    convert_firestore_entity,
+    convert_langchain_document,
+)
 
 USER_AGENT_LOADER = "langchain-google-datastore-python:document_loader"
 USER_AGENT_SAVER = "langchain-google-datastore-python:document_saver"
 WRITE_BATCH_SIZE = 500
-TYPE = "datastore_type"
 
 if TYPE_CHECKING:
     from google.cloud.datastore import Client, Query
@@ -109,9 +112,9 @@ class DatastoreSaver:
                 if self.kind:
                     key = self.client.key(self.kind)
                 elif (
-                    entity_dict["key"]
-                    and ("type" in entity_dict["key"])
-                    and (entity_dict["key"]["type"] == TYPE)
+                    entity_dict.get("key")
+                    and entity_dict["key"].get(TypeEnum.DATASTORE_TYPE.value)
+                    == TypeEnum.KEY.value
                 ):
                     key = self.client.key(*entity_dict["key"]["path"])
                 else:
@@ -142,9 +145,9 @@ class DatastoreSaver:
                 elif doc:
                     entity_dict = convert_langchain_document(doc, self.client)
                     if (
-                        entity_dict["key"]
-                        and ("type" in entity_dict["key"])
-                        and (entity_dict["key"]["type"] == TYPE)
+                        entity_dict.get("key")
+                        and entity_dict["key"].get(TypeEnum.DATASTORE_TYPE.value)
+                        == TypeEnum.KEY.value
                     ):
                         key = self.client.key(*entity_dict["key"]["path"])
                 if not key:
@@ -153,7 +156,7 @@ class DatastoreSaver:
             db_batch.commit()
 
 
-def client_with_user_agent(client: Client, user_agent: str) -> Client:
+def client_with_user_agent(client: Client | None, user_agent: str) -> Client:
     if not client:
         client = datastore.Client()
     client_agent = client._client_info.user_agent

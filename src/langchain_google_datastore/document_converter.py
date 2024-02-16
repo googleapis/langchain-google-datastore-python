@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import ast
 import itertools
+from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Dict, List
 
 import more_itertools
@@ -26,7 +27,12 @@ from langchain_core.documents import Document
 if TYPE_CHECKING:
     from google.cloud.datastore import Client, Entity
 
-TYPE = "datastore_type"
+
+class TypeEnum(StrEnum):
+    DATASTORE_TYPE = "datastore_type"
+    KEY = "key"
+    ENTITY = "entity"
+    GEOPOINT = "geopoint"
 
 
 def convert_firestore_entity(
@@ -35,7 +41,12 @@ def convert_firestore_entity(
     metadata_properties: List[str] = [],
 ) -> Document:
     data_entity = dict(entity.items())
-    metadata = {"key": {"path": entity.key.flat_path, "type": TYPE}}
+    metadata = {
+        "key": {
+            "path": entity.key.flat_path,
+            TypeEnum.DATASTORE_TYPE.value: TypeEnum.KEY.value,
+        }
+    }
 
     set_page_properties = set(
         page_content_properties or (data_entity.keys() - set(metadata_properties))
@@ -76,9 +87,8 @@ def convert_langchain_document(document: Document, client: Client) -> dict:
     data = {}
 
     if (
-        ("key" in metadata)
-        and ("type" in metadata["key"])
-        and (metadata["key"]["type"] == TYPE)
+        metadata.get("key")
+        and metadata["key"].get(TypeEnum.DATASTORE_TYPE.value) == TypeEnum.KEY.value
     ):
         path = metadata["key"]
         metadata.pop("key")
@@ -100,18 +110,21 @@ def convert_langchain_document(document: Document, client: Client) -> dict:
 def _convert_from_firestore(val: Any) -> Any:
     val_converted = val
     if isinstance(val, Key):
-        val_converted = {"key": val.flat_path, "type": TYPE}
+        val_converted = {
+            "key": val.flat_path,
+            TypeEnum.DATASTORE_TYPE.value: TypeEnum.KEY.value,
+        }
     elif isinstance(val, GeoPoint):
         val_converted = {
             "latitude": val.latitude,
             "longitude": val.longitude,
-            "type": TYPE,
+            TypeEnum.DATASTORE_TYPE.value: TypeEnum.GEOPOINT.value,
         }
     elif isinstance(val, Entity):
         val_converted = {
             "key": val.key.flat_path,
             "properties": _convert_from_firestore(dict(val.items())),
-            "type": TYPE,
+            TypeEnum.DATASTORE_TYPE.value: TypeEnum.ENTITY.value,
         }
     elif isinstance(val, dict):
         val_converted = {k: _convert_from_firestore(v) for k, v in val.items()}
@@ -125,29 +138,11 @@ def _convert_from_langchain(val: Any, client: Client) -> Any:
     val_converted = val
     if isinstance(val, dict):
         l = len(val)
-        if (
-            (l == 2)
-            and ("key" in val)
-            and isinstance(val["key"], tuple)
-            and ("type" in val)
-            and (val["type"] == TYPE)
-        ):
+        if val.get(TypeEnum.DATASTORE_TYPE.value) == TypeEnum.KEY.value:
             val_converted = client.key(*val["key"])
-        elif (
-            (l == 3)
-            and ("latitude" in val)
-            and ("longitude" in val)
-            and ("type" in val)
-            and (val["type"] == TYPE)
-        ):
+        elif val.get(TypeEnum.DATASTORE_TYPE.value) == TypeEnum.GEOPOINT.value:
             val_converted = GeoPoint(val["latitude"], val["longitude"])
-        elif (
-            (l == 3)
-            and ("key" in val)
-            and ("properties" in val)
-            and ("type" in val)
-            and (val["type"] == TYPE)
-        ):
+        elif val.get(TypeEnum.DATASTORE_TYPE.value) == TypeEnum.ENTITY.value:
             key = client.key(*val["key"])
             entity = client.entity(key)
             entity.update(val["properties"])
