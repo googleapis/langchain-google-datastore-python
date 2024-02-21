@@ -28,9 +28,10 @@ from .document_converter import (
     convert_firestore_entity,
     convert_langchain_document,
 )
+from .version import __version__
 
-USER_AGENT_LOADER = "langchain-google-datastore-python:document_loader"
-USER_AGENT_SAVER = "langchain-google-datastore-python:document_saver"
+USER_AGENT_LOADER = "langchain-google-datastore-python:document_loader" + __version__
+USER_AGENT_SAVER = "langchain-google-datastore-python:document_saver" + __version__
 WRITE_BATCH_SIZE = 500
 
 if TYPE_CHECKING:
