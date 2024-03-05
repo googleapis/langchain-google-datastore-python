@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import itertools
 import json
+
 from typing import TYPE_CHECKING, Any, Dict, List
 
 import more_itertools
