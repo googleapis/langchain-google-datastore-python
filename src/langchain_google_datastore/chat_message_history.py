@@ -23,7 +23,7 @@ from langchain_core.messages import BaseMessage, messages_from_dict
 
 from .version import __version__
 
-USER_AGENT = "langchain-google-datastore-python:chat_history" + __version__
+USER_AGENT = "langchain-google-datastore-python:chat_history/" + __version__
 DEFAULT_KIND = "ChatHistory"
 
 if TYPE_CHECKING:
