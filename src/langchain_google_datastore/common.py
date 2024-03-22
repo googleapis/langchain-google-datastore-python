@@ -13,6 +13,9 @@
 # limitations under the License.
 
 from google.cloud import datastore  # type: ignore
+from google.cloud.datastore_v1.services.datastore.transports.base import (
+    DEFAULT_CLIENT_INFO,  # type: ignore
+)
 
 
 def client_with_user_agent(
