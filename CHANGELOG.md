@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.2](https://github.com/googleapis/langchain-google-datastore-python/compare/v0.1.1...v0.1.2) (2024-03-25)
+
+
+### Bug Fixes
+
+* Update user agent ([#36](https://github.com/googleapis/langchain-google-datastore-python/issues/36)) ([fd38e5f](https://github.com/googleapis/langchain-google-datastore-python/commit/fd38e5f8a6f10d3d183f32a0ce73ee6a47b0c2ef))
+
+
+### Documentation
+
+* Add github links ([#28](https://github.com/googleapis/langchain-google-datastore-python/issues/28)) ([fa19c4d](https://github.com/googleapis/langchain-google-datastore-python/commit/fa19c4db76054dd3e7422f3a8162e0eb41b4aaa5))
+
 ## [0.1.1](https://github.com/googleapis/langchain-google-datastore-python/compare/v0.1.0...v0.1.1) (2024-03-06)
 
 
