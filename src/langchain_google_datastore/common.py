@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+
 from google.cloud import datastore  # type: ignore
 from google.cloud.datastore_v1.services.datastore.transports.base import (
     DEFAULT_CLIENT_INFO,  # type: ignore
@@ -19,7 +21,8 @@ from google.cloud.datastore_v1.services.datastore.transports.base import (
 
 
 def client_with_user_agent(
-    client: datastore.Client | None, user_agent: str
+    user_agent: str,
+    client: Optional[datastore.Client] = None,
 ) -> datastore.Client:
     client_info = DEFAULT_CLIENT_INFO
     client_info.user_agent = user_agent

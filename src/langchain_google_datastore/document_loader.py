@@ -15,13 +15,13 @@
 from __future__ import annotations
 
 import itertools
-from typing import TYPE_CHECKING, Iterator, List, Optional
+from typing import TYPE_CHECKING, Any, Iterator, List, Optional, Union
 
 import more_itertools
+from google.cloud import datastore
 from langchain_community.document_loaders.base import BaseLoader
 from langchain_core.documents import Document
 
-from .common import client_with_user_agent
 from .document_converter import (
     DATASTORE_TYPE,
     KEY,
@@ -41,7 +41,7 @@ if TYPE_CHECKING:
 class DatastoreLoader(BaseLoader):
     def __init__(
         self,
-        source: Query | str,
+        source: Union[Query, str],
         page_content_properties: List[str] = [],
         metadata_properties: List[str] = [],
         client: Optional[Client] = None,
@@ -155,3 +155,14 @@ class DatastoreSaver:
                     )
                 db_batch.delete(key)
             db_batch.commit()
+
+
+def client_with_user_agent(client: Client | None, user_agent: str) -> Client:
+    if not client:
+        client = datastore.Client()
+    client_agent = client._client_info.user_agent
+    if not client_agent:
+        client._client_info.user_agent = user_agent
+    elif user_agent not in client_agent:
+        client._client_info.user_agent = " ".join([client_agent, user_agent])
+    return client

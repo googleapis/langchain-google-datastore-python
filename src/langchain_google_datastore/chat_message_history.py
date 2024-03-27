@@ -45,7 +45,7 @@ class DatastoreChatMessageHistory(BaseChatMessageHistory):
                 and by default it will use `ChatHistory` as the kind.
             client: Client for interacting with the Google Cloud Firestore API.
         """
-        self.client = client_with_user_agent(client, USER_AGENT)
+        self.client = client_with_user_agent(USER_AGENT, client)
         self.session_id = session_id
         self.key = self.client.key(kind, session_id)
         self.messages: List[BaseMessage] = []
