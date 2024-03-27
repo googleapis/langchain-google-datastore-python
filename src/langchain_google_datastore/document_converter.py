@@ -14,11 +14,9 @@
 
 from __future__ import annotations
 
-import itertools
 import json
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING, Any, List
 
-import more_itertools
 from google.cloud.datastore import Entity, Key
 from google.cloud.datastore.helpers import GeoPoint
 from langchain_core.documents import Document
