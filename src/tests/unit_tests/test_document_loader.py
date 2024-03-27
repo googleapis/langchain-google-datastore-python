@@ -15,6 +15,7 @@
 
 import time
 import unittest.mock as mock
+import uuid
 from unittest import TestCase
 
 import pytest
@@ -30,8 +31,9 @@ def test_case() -> TestCase:
 
 
 def test_firestore_write_roundtrip_and_load() -> None:
-    saver = DatastoreSaver("WriteRoundTrip")
-    loader = DatastoreLoader("WriteRoundTrip")
+    source = "WriteRoundTrip" + str(uuid.uuid4())
+    saver = DatastoreSaver(source)
+    loader = DatastoreLoader(source)
 
     docs = [Document(page_content="data", metadata={})]
 
@@ -53,8 +55,9 @@ def test_firestore_write_roundtrip_and_load() -> None:
 
 
 def test_firestore_write_load_batch(test_case: TestCase) -> None:
-    saver = DatastoreSaver("WriteBatch")
-    loader = DatastoreLoader("WriteBatch")
+    source = "WriteBatch" + str(uuid.uuid4())
+    saver = DatastoreSaver(source)
+    loader = DatastoreLoader(source)
     NUM_DOCS = 1000
 
     docs = []
@@ -79,13 +82,14 @@ def test_firestore_write_load_batch(test_case: TestCase) -> None:
 
 
 def test_firestore_write_with_key(test_case: TestCase) -> None:
+    source = "WriteRef" + str(uuid.uuid4())
     saver = DatastoreSaver()
-    loader = DatastoreLoader("WriteRef")
+    loader = DatastoreLoader(source)
 
     expected_doc = [
         Document(
             page_content='{"f1": 1, "f2": 2}',
-            metadata={"key": {"path": ("WriteRef", "doc"), "datastore_type": "key"}},
+            metadata={"key": {"path": (source, "doc"), "datastore_type": "key"}},
         )
     ]
     saver.upsert_documents(expected_doc)
@@ -102,23 +106,24 @@ def test_firestore_write_with_key(test_case: TestCase) -> None:
 
 
 def test_firestore_delete_with_keys(test_case: TestCase) -> None:
+    source = "WriteKind" + str(uuid.uuid4())
     saver = DatastoreSaver()
-    loader = DatastoreLoader("WriteKind")
+    loader = DatastoreLoader(source)
 
     doc_to_insert = [
         Document(
             page_content='{"f1": 1, "f2": 2}',
-            metadata={"key": {"path": ("WriteKind", "bar"), "datastore_type": "key"}},
+            metadata={"key": {"path": (source, "bar"), "datastore_type": "key"}},
         )
     ]
 
     expected_doc = [
         Document(
             page_content='{"f1": 1, "f2": 2}',
-            metadata={"key": {"path": ("WriteKind", "bar"), "datastore_type": "key"}},
+            metadata={"key": {"path": (source, "bar"), "datastore_type": "key"}},
         )
     ]
-    keys = [["WriteKind", "bar"]]
+    keys = [[source, "bar"]]
     saver.upsert_documents(documents=doc_to_insert)
     # wait 1s for consistency
     time.sleep(1)
@@ -149,9 +154,10 @@ def test_firestore_load_with_fields(
     expected_metadata,
     test_case,
 ):
-    saver = DatastoreSaver("WritePageFields")
+    id = str(uuid.uuid4())
+    saver = DatastoreSaver("WritePageFields" + id)
     loader = DatastoreLoader(
-        source="WritePageFields",
+        source="WritePageFields" + id,
         page_content_properties=page_properties,
         metadata_properties=metadata_properties,
     )
@@ -177,8 +183,9 @@ def test_firestore_load_with_fields(
 
 
 def test_firestore_load_from_query(test_case: TestCase):
-    saver = DatastoreSaver("WriteQuery")
-    loader_cleanup = DatastoreLoader("WriteQuery")
+    source = "WriteQuery" + str(uuid.uuid4())
+    saver = DatastoreSaver(source)
+    loader_cleanup = DatastoreLoader(source)
 
     docs_to_insert = [
         Document(page_content='{"num": 20, "region": "west_coast"}'),
@@ -196,7 +203,7 @@ def test_firestore_load_from_query(test_case: TestCase):
             metadata={"key": mock.ANY},
         ),
     ]
-    query_load = pytest.client.query(kind="WriteQuery")
+    query_load = pytest.client.query(kind=source)
     query_load.add_filter("region", "=", "west_coast")
     loader = DatastoreLoader(query_load)
 
@@ -214,7 +221,7 @@ def test_firestore_load_from_query(test_case: TestCase):
 
 
 def test_firestore_empty_load():
-    loader = DatastoreLoader("Empty")
+    loader = DatastoreLoader("Empty" + str(uuid.uuid4()))
 
     loaded_docs = loader.load()
 
@@ -223,8 +230,9 @@ def test_firestore_empty_load():
 
 def test_firestore_custom_client() -> None:
     client = Client(namespace="namespace")
-    saver = DatastoreSaver("Custom", client=client)
-    loader = DatastoreLoader("Custom", client=client)
+    id = str(uuid.uuid4())
+    saver = DatastoreSaver("Custom" + id, client=client)
+    loader = DatastoreLoader("Custom" + id, client=client)
 
     docs = [Document(page_content="data", metadata={})]
 
