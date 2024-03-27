@@ -15,12 +15,12 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Any, Iterator, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
-from google.cloud import datastore
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.messages import BaseMessage, messages_from_dict
 
+from .common import client_with_user_agent
 from .version import __version__
 
 USER_AGENT = "langchain-google-datastore-python:chat_history/" + __version__
@@ -45,12 +45,7 @@ class DatastoreChatMessageHistory(BaseChatMessageHistory):
                 and by default it will use `ChatHistory` as the kind.
             client: Client for interacting with the Google Cloud Firestore API.
         """
-        self.client = client or datastore.Client()
-        client_agent = self.client._client_info.user_agent
-        if not client_agent:
-            self.client._client_info.user_agent = USER_AGENT
-        elif USER_AGENT not in client_agent:
-            self.client._client_info.user_agent = " ".join([client_agent, USER_AGENT])
+        self.client = client_with_user_agent(USER_AGENT, client)
         self.session_id = session_id
         self.key = self.client.key(kind, session_id)
         self.messages: List[BaseMessage] = []

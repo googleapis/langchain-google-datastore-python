@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 import itertools
-from typing import TYPE_CHECKING, Any, Iterator, List, Optional
+from typing import TYPE_CHECKING, Any, Iterator, List, Optional, Union
 
 import more_itertools
 from google.cloud import datastore
@@ -41,7 +41,7 @@ if TYPE_CHECKING:
 class DatastoreLoader(BaseLoader):
     def __init__(
         self,
-        source: Query | str,
+        source: Union[Query, str],
         page_content_properties: List[str] = [],
         metadata_properties: List[str] = [],
         client: Optional[Client] = None,
