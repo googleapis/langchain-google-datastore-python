@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+
 from google.cloud import datastore  # type: ignore
 from google.cloud.datastore_v1.services.datastore.transports.base import (
     DEFAULT_CLIENT_INFO,  # type: ignore
 )
-from typing import Optional
 
 
 def client_with_user_agent(
