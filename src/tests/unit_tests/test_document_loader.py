@@ -83,7 +83,7 @@ def test_firestore_write_load_batch(test_case: TestCase) -> None:
 
 def test_firestore_write_with_key(test_case: TestCase) -> None:
     source = "WriteRef" + str(uuid.uuid4())
-    saver = DatastoreSaver(source)
+    saver = DatastoreSaver()
     loader = DatastoreLoader(source)
 
     expected_doc = [
@@ -107,7 +107,7 @@ def test_firestore_write_with_key(test_case: TestCase) -> None:
 
 def test_firestore_delete_with_keys(test_case: TestCase) -> None:
     source = "WriteKind" + str(uuid.uuid4())
-    saver = DatastoreSaver(source)
+    saver = DatastoreSaver()
     loader = DatastoreLoader(source)
 
     doc_to_insert = [
