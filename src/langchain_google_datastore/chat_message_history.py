@@ -63,7 +63,10 @@ class DatastoreChatMessageHistory(BaseChatMessageHistory):
         self._upsert_messages()
 
     def _upsert_messages(self) -> None:
-        entity = self.client.entity(self.key)
+        entity = self.client.entity(
+            self.key,
+            exclude_from_indexes=["messages"],
+        )
         entity["messages"] = encode_messages(self.messages)
         self.client.put(entity)
 

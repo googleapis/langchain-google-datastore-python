@@ -51,6 +51,31 @@ def test_firestore_history_workflow(test_case: TestCase) -> None:
     assert len(chat_history.messages) == 0
 
 
+def test_firestore_large_history_workflow(test_case: TestCase) -> None:
+    session_id = uuid.uuid4().hex
+    chat_history = DatastoreChatMessageHistory(
+        session_id=session_id, kind="HistoryWorkflow"
+    )
+
+    ai_message = "A" * 5000
+    user_message = "B" * 5000
+
+    chat_history.add_ai_message(ai_message)
+    chat_history.add_user_message(user_message)
+
+    expected_messages = [
+        AIMessage(content=ai_message),
+        HumanMessage(content=user_message),
+    ]
+
+    test_case.assertCountEqual(expected_messages, chat_history.messages)
+
+    chat_history.clear()
+    chat_history._load_messages()
+
+    assert len(chat_history.messages) == 0
+
+
 def test_firestore_load_messages(test_case: TestCase) -> None:
     NUM_MESSAGES = 25
     session_id = uuid.uuid4().hex
