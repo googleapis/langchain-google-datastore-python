@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.0](https://github.com/googleapis/langchain-google-datastore-python/compare/v0.1.2...v0.2.0) (2024-03-28)
+
+
+### Features
+
+* **ci:** Test against multiple versions ([#35](https://github.com/googleapis/langchain-google-datastore-python/issues/35)) ([2e857be](https://github.com/googleapis/langchain-google-datastore-python/commit/2e857be621b1a65ff23cfad6fdbcce40ebdfc427))
+
+
+### Bug Fixes
+
+* Duplicate user agent function ([#43](https://github.com/googleapis/langchain-google-datastore-python/issues/43)) ([e852190](https://github.com/googleapis/langchain-google-datastore-python/commit/e852190218aaa62bad84bad7564fa1778c0a0d1e))
+
 ## [0.1.2](https://github.com/googleapis/langchain-google-datastore-python/compare/v0.1.1...v0.1.2) (2024-03-25)
 
 
