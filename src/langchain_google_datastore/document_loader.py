@@ -15,13 +15,14 @@
 from __future__ import annotations
 
 import itertools
-from typing import TYPE_CHECKING, Any, Iterator, List, Optional, Union
+from typing import TYPE_CHECKING, Iterator, List, Optional, Union
 
 import more_itertools
 from google.cloud import datastore
 from langchain_community.document_loaders.base import BaseLoader
 from langchain_core.documents import Document
 
+from .common import client_with_user_agent
 from .document_converter import (
     DATASTORE_TYPE,
     KEY,
@@ -57,7 +58,7 @@ class DatastoreLoader(BaseLoader):
                 By default it will write all fields that are not in `page_content` into `metadata`.
             client: Client for interacting with the Google Cloud Datastore API.
         """
-        self.client = client_with_user_agent(client, USER_AGENT_LOADER)
+        self.client = client_with_user_agent(USER_AGENT_LOADER, client)
         self.source = source
         self.page_content_properties = page_content_properties
         self.metadata_properties = metadata_properties
@@ -73,7 +74,7 @@ class DatastoreLoader(BaseLoader):
             query = self.client.query(kind=self.source)
         else:
             query = self.source
-            query._client = client_with_user_agent(query._client, USER_AGENT_LOADER)
+            query._client = client_with_user_agent(USER_AGENT_LOADER, query._client)
 
         for entity in query.fetch():
             yield convert_firestore_entity(
@@ -96,7 +97,7 @@ class DatastoreSaver:
             client: Client for interacting with the Google Cloud Datastore API.
         """
         self.kind = kind
-        self.client = client_with_user_agent(client, USER_AGENT_SAVER)
+        self.client = client_with_user_agent(USER_AGENT_SAVER, client)
 
     def upsert_documents(
         self,
@@ -155,14 +156,3 @@ class DatastoreSaver:
                     )
                 db_batch.delete(key)
             db_batch.commit()
-
-
-def client_with_user_agent(client: Client | None, user_agent: str) -> Client:
-    if not client:
-        client = datastore.Client()
-    client_agent = client._client_info.user_agent
-    if not client_agent:
-        client._client_info.user_agent = user_agent
-    elif user_agent not in client_agent:
-        client._client_info.user_agent = " ".join([client_agent, user_agent])
-    return client
