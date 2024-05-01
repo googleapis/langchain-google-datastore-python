@@ -8,12 +8,12 @@ Datastore for LangChain
 
 .. |preview| image:: https://img.shields.io/badge/support-preview-orange.svg
    :target: https://cloud.google.com/products#product-launch-stages
-.. |pypi| image:: https://img.shields.io/pypi/v/langchain-google-firestore.svg
-   :target: https://pypi.org/project/langchain-google-firestore/
-.. |versions| image:: https://img.shields.io/pypi/pyversions/langchain-google-firestore.svg
-   :target: https://pypi.org/project/langchain-google-firestore/
-.. _Client Library Documentation: https://cloud.google.com/python/docs/reference/langchain-google-firestore/latest
-.. _Product Documentation: https://cloud.google.com/firestore
+.. |pypi| image:: https://img.shields.io/pypi/v/langchain-google-datastore.svg
+   :target: https://pypi.org/project/langchain-google-datastore/
+.. |versions| image:: https://img.shields.io/pypi/pyversions/langchain-google-datastore.svg
+   :target: https://pypi.org/project/langchain-google-datastore/
+.. _Client Library Documentation: https://cloud.google.com/python/docs/reference/langchain-google-datastore/latest
+.. _Product Documentation: https://cloud.google.com/datastore
 
 Quick Start
 -----------
@@ -28,7 +28,7 @@ steps:
 
 .. _Select or create a Cloud Platform project.: https://console.cloud.google.com/project
 .. _Enable billing for your project.: https://cloud.google.com/billing/docs/how-to/modify-project#enable_billing_for_a_project
-.. _Enable the Google Cloud Datastore API.: https://console.cloud.google.com/flows/enableapi?apiid=firestore.googleapis.com
+.. _Enable the Google Cloud Datastore API.: https://console.cloud.google.com/flows/enableapi?apiid=datastore.googleapis.com
 .. _Setup Authentication.: https://googleapis.dev/python/google-api-core/latest/auth.html
 
 Installation
@@ -54,7 +54,7 @@ Mac/Linux
    pip install virtualenv
    virtualenv <your-env>
    source <your-env>/bin/activate
-   <your-env>/bin/pip install langchain-google-firestore
+   <your-env>/bin/pip install langchain-google-datastore
 
 Windows
 ^^^^^^^
@@ -64,7 +64,7 @@ Windows
    pip install virtualenv
    virtualenv <your-env>
    <your-env>\Scripts\activate
-   <your-env>\Scripts\pip.exe install langchain-google-firestore
+   <your-env>\Scripts\pip.exe install langchain-google-datastore
 
 Document Loader Usage
 ~~~~~~~~~~~~~~~~~~~~~
@@ -82,7 +82,7 @@ Use a document loader to load data as LangChain ``Document``\ s.
 
 See the full `Document Loader`_ tutorial.
 
-.. _`Document Loader`: https://github.com/googleapis/langchain-google-firestore-python/blob/main/docs/document_loader.ipynb
+.. _`Document Loader`: https://github.com/googleapis/langchain-google-datastore-python/blob/main/docs/document_loader.ipynb
 
 Chat Message History Usage
 --------------------------
@@ -101,7 +101,7 @@ history to LLMs.
 
 See the full `Chat Message History`_ tutorial.
 
-.. _`Chat Message History`: https://github.com/googleapis/langchain-google-firestore-python/blob/main/docs/chat_message_history.ipynb
+.. _`Chat Message History`: https://github.com/googleapis/langchain-google-datastore-python/blob/main/docs/chat_message_history.ipynb
 
 Contributions
 ~~~~~~~~~~~~~
@@ -114,15 +114,15 @@ Please note that this project is released with a Contributor Code of Conduct. By
 this project you agree to abide by its terms. See `Code of Conduct`_ for more
 information.
 
-.. _`CONTRIBUTING`: https://github.com/googleapis/langchain-google-firestore-python/blob/main/CONTRIBUTING.md
-.. _`Code of Conduct`: https://github.com/googleapis/langchain-google-firestore-python/blob/main/CODE_OF_CONDUCT.md
+.. _`CONTRIBUTING`: https://github.com/googleapis/langchain-google-datastore-python/blob/main/CONTRIBUTING.md
+.. _`Code of Conduct`: https://github.com/googleapis/langchain-google-datastore-python/blob/main/CODE_OF_CONDUCT.md
 
 
 License
 -------
 
 Apache 2.0 - See
-`LICENSE <https://github.com/googleapis/langchain-google-firestore-python/blob/main/LICENSE>`_
+`LICENSE <https://github.com/googleapis/langchain-google-datastore-python/blob/main/LICENSE>`_
 for more information.
 
 Disclaimer
