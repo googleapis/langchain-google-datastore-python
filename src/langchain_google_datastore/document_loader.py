@@ -47,16 +47,22 @@ class DatastoreLoader(BaseLoader):
         metadata_properties: List[str] = [],
         client: Optional[Client] = None,
     ) -> None:
-        """Document Loader for Google Cloud Firestore in Datastore Mode.
+        """
+        Document Loader for Google Cloud Firestore in Datastore Mode.
+
         Args:
-            source: The source to load the documents. It can be an instance of Query
+            source (Query or str): The source to load the documents. It can be an instance of Query
                 or the name of the Datastore kind to read from.
-            page_content_propeties: The properties to write into the `page_content`.
-                If an empty or None list is provided all fields will be written into
-                `page_content`. When only one field is provided only the value is written.
-            metadata_properties: The properties to write into the `metadata`.
-                By default it will write all fields that are not in `page_content` into `metadata`.
-            client: Client for interacting with the Google Cloud Datastore API.
+            page_content_properties (list of str): The properties to write into the `page_content`.
+                If an empty or None list is provided, all fields will be written into
+                `page_content`. When only one field is provided, only the value is written.
+            metadata_properties (list of str): The properties to write into the `metadata`.
+                By default, it will write all fields that are not in `page_content` into `metadata`.
+            client (DatastoreClient): Client for interacting with the Google Cloud Datastore API.
+
+        Returns:
+            list of dict: Returns a list of documents with their content structured as specified
+            by `page_content_properties` and `metadata_properties`.
         """
         self.client = client_with_user_agent(USER_AGENT_LOADER, client)
         self.source = source
@@ -91,9 +97,10 @@ class DatastoreSaver:
         client: Optional[Client] = None,
     ) -> None:
         """Document Saver for Google Cloud Firestore in Datastore Mode.
+
         Args:
             kind: The kind to write the entities into. If this
-              value is present it will write entities with an auto generated id.
+                value is present it will write entities with an auto generated id.
             client: Client for interacting with the Google Cloud Datastore API.
         """
         self.kind = kind
@@ -104,8 +111,9 @@ class DatastoreSaver:
         documents: List[Document],
     ) -> None:
         """Create / merge documents into the Firestore database in Datastore Mode.
+
         Args:
-         documents: List of documents to be written into Datastore.
+            documents: List of documents to be written into Datastore.
         """
         for batch in more_itertools.chunked(documents, WRITE_BATCH_SIZE):
             db_batch = self.client.batch()
@@ -129,11 +137,12 @@ class DatastoreSaver:
         self, documents: List[Document], keys: Optional[List[List[str]]] = None
     ) -> None:
         """Delete documents from the Datastore database.
+
         Args:
-          documents: List of documents to be deleted from Datastore . It will try to create
-            the entity key from the `key` in the document metadata.
-          keys: List of Key paths to be delted from Datastore. If provided `documents` will
-            be ignored.
+            documents: List of documents to be deleted from Datastore . It will try to create
+                the entity key from the `key` in the document metadata.
+            keys: List of Key paths to be delted from Datastore. If provided `documents` will
+                be ignored.
         """
         docs_list = itertools.zip_longest(documents, keys or [])
         for batch in more_itertools.chunked(docs_list, WRITE_BATCH_SIZE):
