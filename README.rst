@@ -85,7 +85,7 @@ See the full `Document Loader`_ tutorial.
 .. _`Document Loader`: https://github.com/googleapis/langchain-google-datastore-python/blob/main/docs/document_loader.ipynb
 
 Chat Message History Usage
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Use ``ChatMessageHistory`` to store messages and provide conversation
 history to LLMs.
