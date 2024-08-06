@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/googleapis/langchain-google-datastore-python/compare/v0.2.0...v0.2.1) (2024-08-06)
+
+
+### Documentation
+
+* Fix font size in README.rst ([#69](https://github.com/googleapis/langchain-google-datastore-python/issues/69)) ([59fdf4e](https://github.com/googleapis/langchain-google-datastore-python/commit/59fdf4e4e3fb9a238d73aeac41bae3523b45587b))
+
 ## [0.2.0](https://github.com/googleapis/langchain-google-datastore-python/compare/v0.1.2...v0.2.0) (2024-05-01)
 
 
