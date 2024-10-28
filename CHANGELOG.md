@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/googleapis/langchain-google-datastore-python/compare/v0.3.0...v0.3.1) (2024-10-28)
+
+
+### Bug Fixes
+
+* **deps:** Update python-nonmajor ([#72](https://github.com/googleapis/langchain-google-datastore-python/issues/72)) ([eb62784](https://github.com/googleapis/langchain-google-datastore-python/commit/eb6278462be320c98bc0fa8ccc3a0565b36cd9cd))
+
 ## [0.3.0](https://github.com/googleapis/langchain-google-datastore-python/compare/v0.2.0...v0.3.0) (2024-10-28)
 
 
