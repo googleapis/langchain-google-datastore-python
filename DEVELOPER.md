@@ -32,11 +32,11 @@ These tests are registered as required tests in `.github/sync-repo-settings.yaml
 
 #### Trigger Setup
 
-Cloud Build triggers (for Python versions 3.8 to 3.11) were created with the following specs:
+Cloud Build triggers (for Python versions 3.9 to 3.11) were created with the following specs:
 
 ```YAML
-name: integration-test-pr-py38
-description: Run integration tests on PR for Python 3.8
+name: integration-test-pr-py39
+description: Run integration tests on PR for Python 3.9
 filename: integration.cloudbuild.yaml
 github:
   name: langchain-google-datastore-python
@@ -50,10 +50,10 @@ ignoredFiles:
   - .github/**
   - "*.md"
 substitutions:
-  _VERSION: "3.8"
+  _VERSION: "3.9"
 ```
 
-Use `gcloud builds triggers import --source=trigger.yaml` create triggers via the command line
+Use `gcloud builds triggers import --source=trigger.yaml` to create triggers via the command line
 
 #### Project Setup
 
@@ -71,6 +71,18 @@ Use `gcloud builds triggers import --source=trigger.yaml` create triggers via th
 #### Trigger
 
 To run Cloud Build tests on GitHub from external contributors, ie RenovateBot, comment: `/gcbrun`.
+
+#### Code Coverage
+Please make sure your code is fully tested. The Cloud Build integration tests are run with the `pytest-cov` code coverage plugin. They fail for PRs with a code coverage less than the threshold specified in `.coveragerc`.  If your file is inside the main module and should be ignored by code coverage check, add it to the `omit` section of `.coveragerc`.
+
+Check for code coverage report in any Cloud Build integration test log. 
+Here is a breakdown of the report:
+- `Stmts`:  lines of executable code (statements).
+- `Miss`: number of lines not covered by tests.
+- `Branch`: branches of executable code (e.g an if-else clause may count as 1 statement but 2 branches; test for both conditions to have both branches covered).
+- `BrPart`: number of branches not covered by tests.
+- `Cover`: average coverage of files.
+- `Missing`: lines that are not covered by tests.
 
 
 [triggers]: https://console.cloud.google.com/cloud-build/triggers?e=13802955&project=langchain-datastore-testing

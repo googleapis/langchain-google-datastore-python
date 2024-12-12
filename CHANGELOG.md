@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.3.1](https://github.com/googleapis/langchain-google-datastore-python/compare/v0.3.0...v0.3.1) (2024-10-28)
+
+
+### Bug Fixes
+
+* **deps:** Update python-nonmajor ([#72](https://github.com/googleapis/langchain-google-datastore-python/issues/72)) ([eb62784](https://github.com/googleapis/langchain-google-datastore-python/commit/eb6278462be320c98bc0fa8ccc3a0565b36cd9cd))
+
+## [0.3.0](https://github.com/googleapis/langchain-google-datastore-python/compare/v0.2.0...v0.3.0) (2024-10-28)
+
+
+### Features
+
+* Remove support for Python 3.8 ([#76](https://github.com/googleapis/langchain-google-datastore-python/issues/76)) ([d1213ac](https://github.com/googleapis/langchain-google-datastore-python/commit/d1213ac751c2c8ef832a783deb808bf822b494a6))
+
+
+### Documentation
+
+* Fix font size in README.rst ([#69](https://github.com/googleapis/langchain-google-datastore-python/issues/69)) ([59fdf4e](https://github.com/googleapis/langchain-google-datastore-python/commit/59fdf4e4e3fb9a238d73aeac41bae3523b45587b))
+
 ## [0.2.0](https://github.com/googleapis/langchain-google-datastore-python/compare/v0.1.2...v0.2.0) (2024-05-01)
 
 

@@ -1,0 +1,4 @@
+assign_issues:
+  - googleapis/langchain-datastore
+assign_prs:
+  - googleapis/langchain-datastore
