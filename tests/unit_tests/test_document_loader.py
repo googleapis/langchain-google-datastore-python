@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# mypy: disable-error-code="attr-defined"
+# mypy: disable-error-code="attr-defined,no-untyped-call"
 
 import time
 import unittest.mock as mock
@@ -21,6 +21,7 @@ from unittest import TestCase
 import pytest
 from google.cloud.datastore import Client
 from langchain_core.documents import Document
+from typing import Any, Dict, List, String
 
 from langchain_google_datastore import DatastoreLoader, DatastoreSaver
 
@@ -148,12 +149,12 @@ def test_firestore_delete_with_keys(test_case: TestCase) -> None:
     ],
 )
 def test_firestore_load_with_fields(
-    page_properties,
-    metadata_properties,
-    expected_page_content,
-    expected_metadata,
-    test_case,
-):
+    page_properties : List[String],
+    metadata_properties : List[String],
+    expected_page_content : String[String],
+    expected_metadata : Dict[String, Any],
+    test_case : TestCase,
+) -> None:
     id = str(uuid.uuid4())
     saver = DatastoreSaver("WritePageFields" + id)
     loader = DatastoreLoader(
@@ -182,7 +183,7 @@ def test_firestore_load_with_fields(
     assert len(deleted_docs) == 0
 
 
-def test_firestore_load_from_query(test_case: TestCase):
+def test_firestore_load_from_query(test_case: TestCase) -> None:
     source = "WriteQuery" + str(uuid.uuid4())
     saver = DatastoreSaver(source)
     loader_cleanup = DatastoreLoader(source)
@@ -220,7 +221,7 @@ def test_firestore_load_from_query(test_case: TestCase):
     assert len(deleted_docs) == 0
 
 
-def test_firestore_empty_load():
+def test_firestore_empty_load() -> None:
     loader = DatastoreLoader("Empty" + str(uuid.uuid4()))
 
     loaded_docs = loader.load()
