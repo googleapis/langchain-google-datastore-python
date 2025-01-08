@@ -16,12 +16,12 @@
 import time
 import unittest.mock as mock
 import uuid
+from typing import Any, Dict, List
 from unittest import TestCase
 
 import pytest
 from google.cloud.datastore import Client
 from langchain_core.documents import Document
-from typing import Any, Dict, List
 
 from langchain_google_datastore import DatastoreLoader, DatastoreSaver
 

@@ -23,8 +23,9 @@ from google.cloud.datastore.helpers import GeoPoint
 from langchain_core.documents import Document
 
 if TYPE_CHECKING:
-    from google.cloud.datastore import Client, Entity
     from typing import Any
+
+    from google.cloud.datastore import Client, Entity
 
 
 DATASTORE_TYPE = "datastore_type"
