@@ -19,4 +19,4 @@ from google.cloud.datastore import Client
 
 
 def pytest_configure() -> None:
-  pytest.client: Client = Client() # type: ignore
+    pytest.client: Client = Client()  # type: ignore

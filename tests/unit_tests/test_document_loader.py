@@ -149,11 +149,11 @@ def test_firestore_delete_with_keys(test_case: TestCase) -> None:
     ],
 )
 def test_firestore_load_with_fields(
-    page_properties : List[Any],
-    metadata_properties : List[Any],
-    expected_page_content : Any,
-    expected_metadata : Dict[Any, Any],
-    test_case : TestCase,
+    page_properties: List[Any],
+    metadata_properties: List[Any],
+    expected_page_content: Any,
+    expected_metadata: Dict[Any, Any],
+    test_case: TestCase,
 ) -> None:
     id = str(uuid.uuid4())
     saver = DatastoreSaver("WritePageFields" + id)

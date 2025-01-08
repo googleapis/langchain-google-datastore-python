@@ -27,7 +27,7 @@ def client_with_user_agent(
     client_info = DEFAULT_CLIENT_INFO
     client_info.user_agent = user_agent
     if not client:
-      client = datastore.Client(client_info=client_info) # type: ignore
+        client = datastore.Client(client_info=client_info)  # type: ignore
     client_agent = client._client_info.user_agent
     if not client_agent:
         client._client_info.user_agent = user_agent
