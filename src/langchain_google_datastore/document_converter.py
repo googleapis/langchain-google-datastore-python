@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# mypy: disable-error-code="no-untyped-call"
 
 from __future__ import annotations
 
@@ -22,6 +23,8 @@ from google.cloud.datastore.helpers import GeoPoint
 from langchain_core.documents import Document
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from google.cloud.datastore import Client, Entity
 
 
@@ -58,24 +61,18 @@ def convert_firestore_entity(
             metadata[k] = _convert_from_firestore(data_entity[k])
     for k in sorted(set_page_properties):
         if k in data_entity:
-            print("--here")
             page_content[k] = _convert_from_firestore(data_entity[k])
-            print(page_content)
-            print("--here")
 
     if len(page_content) == 1:
         page_content = str(page_content.popitem()[1])  # type: ignore
     else:
         page_content = json.dumps(page_content)  # type: ignore
 
-    print("--after conversion hhere")
-    print(page_content)
-    print("--after conversion hhere")
     doc = Document(page_content=page_content, metadata=metadata)  # type: ignore
     return doc
 
 
-def convert_langchain_document(document: Document, client: Client) -> dict:
+def convert_langchain_document(document: Document, client: Client) -> dict[Any, Any]:
     metadata = document.metadata.copy()
     path = None
     data = {}

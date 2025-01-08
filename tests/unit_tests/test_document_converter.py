@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# mypy: disable-error-code="attr-defined"
+# mypy: disable-error-code="arg-type,attr-defined,no-untyped-call,no-untyped-def"
 
 import pytest
 from google.cloud import datastore
@@ -352,7 +352,7 @@ def test_convert_firestore_entity_with_filters(
         ),
     ],
 )
-def test_convert_langchain_document(langchain_doc, entity_dict):
+def test_convert_langchain_document(langchain_doc, entity_dict) -> None:
     return_doc = convert_langchain_document(langchain_doc, pytest.client)
 
     assert return_doc == entity_dict
@@ -374,7 +374,7 @@ def test_convert_langchain_document(langchain_doc, entity_dict):
         },
     ],
 )
-def test_roundtrip_firestore(entity_dict):
+def test_roundtrip_firestore(entity_dict) -> None:
     key = entity_dict["key"]
     key_expected = {"path": ("foo", "bar"), DATASTORE_TYPE: KEY}
     entity = pytest.client.entity(key)
