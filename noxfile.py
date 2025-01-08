@@ -24,7 +24,7 @@ from typing import Optional
 
 import nox
 
-DEFAULT_PYTHON_VERSION = "3.10"
+DEFAULT_PYTHON_VERSION = "3.9"
 CURRENT_DIRECTORY = pathlib.Path(__file__).parent.absolute()
 
 nox.options.sessions = [
@@ -36,7 +36,7 @@ nox.options.sessions = [
 nox.options.error_on_missing_interpreters = True
 
 
-@nox.session(python="3.10")
+@nox.session(python="3.9")
 def docs(session):
     """Build the docs for this library."""
 
@@ -71,7 +71,7 @@ def docs(session):
     )
 
 
-@nox.session(python="3.10")
+@nox.session(python="3.9")
 def docfx(session):
     """Build the docfx yaml files for this library."""
 
