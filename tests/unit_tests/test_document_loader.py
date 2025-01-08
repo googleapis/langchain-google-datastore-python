@@ -21,7 +21,7 @@ from unittest import TestCase
 import pytest
 from google.cloud.datastore import Client
 from langchain_core.documents import Document
-from typing import Any, Dict, List, String
+from typing import Any, Dict, List
 
 from langchain_google_datastore import DatastoreLoader, DatastoreSaver
 
@@ -149,10 +149,10 @@ def test_firestore_delete_with_keys(test_case: TestCase) -> None:
     ],
 )
 def test_firestore_load_with_fields(
-    page_properties : List[String],
-    metadata_properties : List[String],
-    expected_page_content : String[String],
-    expected_metadata : Dict[String, Any],
+    page_properties : List[Any],
+    metadata_properties : List[Any],
+    expected_page_content : Any,
+    expected_metadata : Dict[Any, Any],
     test_case : TestCase,
 ) -> None:
     id = str(uuid.uuid4())
