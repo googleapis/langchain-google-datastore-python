@@ -18,5 +18,5 @@ import pytest
 from google.cloud.datastore import Client
 
 
-def pytest_configure():
-    pytest.client: Client = Client()
+def pytest_configure() -> None:
+    pytest.client: Client = Client()  # type: ignore

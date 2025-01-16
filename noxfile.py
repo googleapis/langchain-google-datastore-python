@@ -36,7 +36,7 @@ nox.options.sessions = [
 nox.options.error_on_missing_interpreters = True
 
 
-@nox.session(python="3.10")
+@nox.session(python="3.9")
 def docs(session):
     """Build the docs for this library."""
 
